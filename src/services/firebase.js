@@ -1,16 +1,48 @@
 import { firebase, FieldValue } from '../lib/firebase';
 
 export async function doesUsernameExist(username) {
-  try {
-    const result = await firebase
-      .firestore()
-      .collection('users')
-      .where('username', '==', username.toLowerCase().trim())
-      .get();
+  const result = await firebase
+    .firestore()
+    .collection('users')
+    .where('username', '==', username.toLowerCase().trim())
+    .get();
 
-    return result.docs.length > 0;
-  } catch (error) {
-    console.log(error.message);
+  return result.docs.length > 0;
+}
+
+//Profile Page => checking if the username the active user looking for exist in Firestore or not
+export async function getUserByUsername(username) {
+  const result = await firebase
+    .firestore()
+    .collection('users')
+    .where('username', '==', username.toLowerCase().trim())
+    .get();
+
+  return result.docs.map(profile => {
+    return {
+      ...profile.data(),
+      docId: profile.id,
+    };
+  });
+}
+
+//Profile (getting photos of users we search for =>  www.instagram.com/p/username)
+export async function getUserPhotosByUserId(userId) {
+  const result = await firebase
+    .firestore()
+    .collection('photos')
+    .where('userId', '==', userId)
+    .get();
+
+  if (!result.empty) {
+    return result.docs.map(item => {
+      return {
+        ...item.data(),
+        docId: item.id,
+      };
+    });
+  } else {
+    return [];
   }
 }
 
@@ -114,13 +146,36 @@ export async function updateFollowedUserFollowers(
     });
 }
 
+//Profile Page Toggling Follow and Unfollow and make changes to Firestore Database
+export async function toggleFollow(
+  loggedInUserDocId,
+  profileUserId,
+  profileDocId,
+  followingUserId, //loggedInUserId => logged in user is the one that follows the profile User (userFirestore)
+  isFollowingProfile
+) {
+  await updateLoggedInUserFollowing(
+    loggedInUserDocId,
+    profileUserId,
+    isFollowingProfile
+  );
+  await updateFollowedUserFollowers(
+    profileDocId,
+    followingUserId,
+    isFollowingProfile
+  );
+}
+
+//Checking if the Current Logged In User is Following the User Profile searched (wwww.instagram.com/p/Profile)
+export async function isUserFollowingProfile() {}
+
 //getting photos of the people the active user Followed
 export async function getPhotos(userId, following) {
   const result = await firebase
     .firestore()
     .collection('photos')
     .where('userId', 'in', following)
-    .orderBy('dateCreated')
+    .orderBy('dateCreated', 'desc')
     .limit(1)
     .get();
 
@@ -148,7 +203,14 @@ export async function getPhotos(userId, following) {
     })
   );
 
-  return photosWithUserDetails;
+  //if the active user have not followed anyone we have to stop the skeleton loading and tell him to follow people
+
+  if (photosWithUserDetails) {
+    return photosWithUserDetails;
+  } else {
+    //  => if the user follow people that have no posts we returned an empty array []
+    return [];
+  }
 }
 
 //INFINITE SCROLL

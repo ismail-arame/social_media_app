@@ -21,10 +21,10 @@ export default function usePhotos() {
       //does the user actually follow people ?
       if (following.length > 0) {
         followedUserPhotos = await getPhotos(userId, following);
-
-        //so the latest one will be in the Top of the Feed
-        // followedUserPhotos.sort((a, b) => b.dateCreated - a.dateCreated);
         setPhotos(followedUserPhotos);
+      } else {
+        //if the active user have not followed anyone we have to stop the skeleton loading and tell him to follow people
+        setPhotos([]);
       }
     }
 

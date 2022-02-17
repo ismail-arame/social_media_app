@@ -2,17 +2,20 @@ import { useContext } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import FirebaseContext from '../context/firebase';
-import UserContext from '../context/user';
+import UserFirestoreContext from '../context/user-firestore';
 import * as ROUTES from '../constants/routes';
 
 export default function Header() {
-  const { user } = useContext(UserContext);
+  const {
+    userFirestore: { username },
+  } = useContext(UserFirestoreContext);
+
   const { firebase } = useContext(FirebaseContext);
 
   const history = useHistory();
 
   return (
-    <header className="h-16 bg-white border-b border-gray-primary mb-8">
+    <header className="h-16 bg-white border-b border-gray-primary mb-8 fixed w-screen top-0 z-10">
       <div className=" container mx-auto max-w-screen-lg h-full px-10">
         <div className=" flex justify-between h-full">
           <div className="text-gray-700 text-center items-center cursor-pointer h-full">
@@ -21,13 +24,13 @@ export default function Header() {
                 <img
                   src="/images/logo.png"
                   alt="instagram logo"
-                  className="w-6/12"
+                  className="w-6/12 "
                 />
               </Link>
             </h1>
           </div>
           <div className="text-gray-700 text-center flex items-center ">
-            {user ? (
+            {username ? (
               <>
                 <Link to={ROUTES.DASHBOARD} aria-label="Dashboard">
                   <svg
@@ -75,11 +78,11 @@ export default function Header() {
                   </svg>
                 </button>
                 <div className="flex items-center cursor-pointer">
-                  <Link to={`/p/${user.displayName}`}>
+                  <Link to={`/p/${username}`}>
                     <img
-                      src={`/images/avatars/${user.displayName}.jpg`}
+                      src={`/images/avatars/${username}.jpg`}
                       className="flex rounded-full h-8 w-8"
-                      alt={`${user.displayName} profile`}
+                      alt={`${username} profile`}
                     />
                   </Link>
                 </div>
@@ -89,7 +92,7 @@ export default function Header() {
                 <Link to={ROUTES.LOGIN}>
                   <button
                     type="button"
-                    className=" bg-blue-medium font-bold text-sm rounded text-white w-20 h-8"
+                    className=" bg-blue-light font-semibold text-sm rounded text-white w-16 h-8 mr-2"
                   >
                     Log In
                   </button>
@@ -97,7 +100,7 @@ export default function Header() {
                 <Link to={ROUTES.SIGN_UP}>
                   <button
                     type="button"
-                    className=" font-bold text-sm rounded text-blue-medium w-20 h-8"
+                    className=" font-semibold text-sm rounded text-blue-light w-16 h-8"
                   >
                     Sign Up
                   </button>

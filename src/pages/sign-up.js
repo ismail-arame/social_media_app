@@ -50,7 +50,7 @@ export default function SignUp() {
             username: username.toLowerCase(),
             fullName,
             emailAddress: emailAddress.toLowerCase(),
-            following: ['2'],
+            following: [createdUserResult.user.uid, '2'],
             followers: [],
             dateCreated: new Date(),
           });

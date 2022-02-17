@@ -5,19 +5,24 @@ import Timeline from '../components/timeline';
 
 // => '../components/sidebar/index' but index is the entry point so react knows that already without needing to write it
 import Sidebar from '../components/sidebar';
+import useUser from '../hooks/use-user';
+import UserFirestoreContext from '../context/user-firestore';
 
 export default function Dashboard() {
   useEffect(() => {
     document.title = 'Instagram';
   }, []);
+  const { user: userFirestore } = useUser();
 
   return (
-    <div className="bg-gray-background " id="container">
-      <Header />
-      <div className="grid grid-cols-3 gap-4 mx-auto max-w-screen-lg justify-between px-10">
-        <Timeline />
-        <Sidebar />
+    <UserFirestoreContext.Provider value={{ userFirestore }}>
+      <div className="bg-gray-background " id="container">
+        <Header />
+        <div className="grid grid-cols-3 gap-4 mx-auto max-w-screen-lg justify-between px-10 mt-24">
+          <Timeline />
+          <Sidebar />
+        </div>
       </div>
-    </div>
+    </UserFirestoreContext.Provider>
   );
 }

@@ -72,3 +72,6 @@ export function seedDatabase(firebase) {
       });
   }
 }
+
+//POST Showing from Newest to Oldest
+//we did -1 * Date.now() because firebase doesnt allow for decreasing order so to make it we add negative sign to make increasing order to be a decreasing on

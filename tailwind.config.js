@@ -13,6 +13,21 @@ module.exports = {
     content: ["./src/**/*.js", "./src/**/**/*.js"],
   },
   theme: {
+    extend: {
+      keyframes: {
+        wiggle: {
+          "0%, 100%": { transform: "rotate(0deg) scale(1)" },
+          "33%": { transform: "rotate(42deg) scale(1.2)" },
+          "66%": { transform: "rotate(-24deg) scale(1.07)" },
+        },
+        bounceModified: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "25%": { transform: "translateY(-25%)" },
+          "50%": { transform: "translateY(0)" },
+          "75%": { transform: "translateY(-25%)" },
+        },
+      },
+    },
     fill: (theme) => ({
       red: theme("colors.red.primary"),
     }),
@@ -35,6 +50,7 @@ module.exports = {
         primary: "#dbdbdb",
         light: "#868e96",
         transparent: "#b4b4b471",
+        lightweight: "#e9ecef",
       },
       red: {
         primary: "#ed4956",

@@ -5,12 +5,16 @@ import FirebaseContext from '../context/firebase';
 import UserContext from '../context/user';
 import { getUserByUserId } from '../services/firebase';
 import TimelineSkeleton from './timeline-skeleton';
+import UserFirestoreContext from '../context/user-firestore';
 
 export default function Timeline() {
   const { firebase } = useContext(FirebaseContext);
   const { user } = useContext(UserContext);
   const { photos } = usePhotos();
+  const { userFirestore: { following } = {} } =
+    useContext(UserFirestoreContext);
 
+  console.log('following', following);
   const [listOfPhotos, setListOfPhotos] = useState(null);
   //not working as intended better useRef() to keep value between re renders
   // const [lastDocument, setLastDocument] = useState(null);
@@ -18,6 +22,33 @@ export default function Timeline() {
 
   const [nextPosts_loading, setNextPostsLoading] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false); //is there any documents in the collection
+  //to know whether a user have Followed people posts or no
+
+  useEffect(() => {
+    // firebase
+    //   .firestore()
+    //   .collection('photos')
+    //   .onSnapshot(snapshot => {
+    //     setListOfPhotos(
+    //       snapshot.docs.map(item => {
+    //         return {
+    //           ...item.data(),
+    //           docId: item.id,
+    //         };
+    //       })
+    //     );
+    //   });
+    if (photos && photos.length > 0) {
+      const { lastDoc } = photos[0];
+
+      //storing last Document
+      lastDocument.current = lastDoc;
+      // console.log(photos);
+    }
+
+    // console.log('photos', photos);
+    setListOfPhotos(photos);
+  }, [photos]);
 
   const observer = useRef();
   const lastPostElementRef = useCallback(
@@ -25,7 +56,7 @@ export default function Timeline() {
       if (nextPosts_loading) return;
       const obsOptions = {
         root: null,
-        threshold: 0.7, //scrolling 70% of the image and then it will be intersecting
+        threshold: 0, //scrolling 70% of the image and then it will be intersecting
         rootMargin: `0px`,
       };
 
@@ -47,23 +78,13 @@ export default function Timeline() {
   );
   console.log(lastPostElementRef); //the last element fetched is being observed (To Perform Infinite Scrolling)
 
-  useEffect(() => {
-    if (photos) {
-      const { lastDoc } = photos[0];
-
-      //storing last Document
-      lastDocument.current = lastDoc;
-    }
-    setListOfPhotos(photos);
-  }, [photos]);
-
   //Fetching More (INFINTE SCROLL)
   const fetchMore = async userId => {
     setNextPostsLoading(true); //loading State
     const result = await firebase
       .firestore()
       .collection('photos')
-      .orderBy('dateCreated')
+      .orderBy('dateCreated', 'desc')
       // .where('userId', 'in', following)
       .startAfter(lastDocument.current)
       .limit(3)
@@ -105,6 +126,11 @@ export default function Timeline() {
     }
     setNextPostsLoading(false);
   };
+
+  //first we get listOfPhotos as null if the user has FOllowed profiles that have posts listOfPhotos.length > 0 else we return an Empty array to stop the Skeleton Loading and tell the user to follow peaple to see posts
+
+  //if Active User following array is Empty we returned an empty array [] in the /hooks/use-photos.js Custom Hook
+  //if the user follow people that have no posts we returned an empty array [] in /services/firebase.js getphotos()
 
   return (
     <div className="container col-span-2">
