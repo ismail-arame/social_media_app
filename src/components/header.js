@@ -1,9 +1,14 @@
 import { useContext } from 'react';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux';
+import { setOpenUploadModal } from '../redux/upload/upload.actions';
+
 import { useHistory } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import FirebaseContext from '../context/firebase';
 import UserFirestoreContext from '../context/user-firestore';
 import * as ROUTES from '../constants/routes';
+
+import { selectOpenUploadModal } from '../redux/upload/upload.selectors';
 
 export default function Header() {
   const {
@@ -14,8 +19,11 @@ export default function Header() {
 
   const history = useHistory();
 
+  const openUploadModal = useSelector(selectOpenUploadModal, shallowEqual);
+  const dispatch = useDispatch();
+
   return (
-    <header className="h-16 bg-white border-b border-gray-primary mb-8 fixed w-screen top-0 z-10">
+    <header className="h-16 bg-white border-b border-gray-primary mb-8 fixed w-screen top-0 z-20">
       <div className=" container mx-auto max-w-screen-lg h-full px-10">
         <div className=" flex justify-between h-full">
           <div className="text-gray-700 text-center items-center cursor-pointer h-full">
@@ -48,6 +56,56 @@ export default function Header() {
                     />
                   </svg>
                 </Link>
+                <button
+                  type="button"
+                  title="upload"
+                  onClick={() => {
+                    dispatch(setOpenUploadModal());
+                    console.log('upload photo***');
+                  }}
+                >
+                  <svg
+                    className="w-8 mr-6 cursor-pointer"
+                    aria-label="New Post"
+                    color="#262626"
+                    fill="#262626"
+                    height="28"
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width="28"
+                  >
+                    <path
+                      d="M2 12v3.45c0 2.849.698 4.005 1.606 4.944.94.909 2.098 1.608 4.946 1.608h6.896c2.848 0 4.006-.7 4.946-1.608C21.302 19.455 22 18.3 22 15.45V8.552c0-2.849-.698-4.006-1.606-4.945C19.454 2.7 18.296 2 15.448 2H8.552c-2.848 0-4.006.699-4.946 1.607C2.698 4.547 2 5.703 2 8.552z"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                    ></path>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      x1="6.545"
+                      x2="17.455"
+                      y1="12.001"
+                      y2="12.001"
+                    ></line>
+                    <line
+                      fill="none"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      x1="12.003"
+                      x2="12.003"
+                      y1="6.545"
+                      y2="17.455"
+                    ></line>
+                  </svg>
+                </button>
                 <button
                   type="button"
                   title="Sign Out"
@@ -83,6 +141,9 @@ export default function Header() {
                       src={`/images/avatars/${username}.jpg`}
                       className="flex rounded-full h-8 w-8"
                       alt={`${username} profile`}
+                      onError={e => {
+                        e.target.src = '/images/avatars/default.png';
+                      }}
                     />
                   </Link>
                 </div>

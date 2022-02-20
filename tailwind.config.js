@@ -54,6 +54,8 @@ module.exports = {
       },
       red: {
         primary: "#ed4956",
+        100: "#fee2e2",
+        500: "#ef4444",
       },
     },
   },

@@ -7,12 +7,18 @@ import { getUserByUserId } from '../services/firebase';
 import TimelineSkeleton from './timeline-skeleton';
 import UserFirestoreContext from '../context/user-firestore';
 
+import { shallowEqual, useSelector } from 'react-redux';
+import { selectUploadFileLoading } from '../redux/upload/upload.selectors';
+
 export default function Timeline() {
   const { firebase } = useContext(FirebaseContext);
   const { user } = useContext(UserContext);
   const { photos } = usePhotos();
   const { userFirestore: { following } = {} } =
     useContext(UserFirestoreContext);
+
+  //uplading File Loading Status
+  const uploadFileLoading = useSelector(selectUploadFileLoading, shallowEqual);
 
   console.log('following', following);
   const [listOfPhotos, setListOfPhotos] = useState(null);
@@ -25,30 +31,75 @@ export default function Timeline() {
   //to know whether a user have Followed people posts or no
 
   useEffect(() => {
-    // firebase
-    //   .firestore()
-    //   .collection('photos')
-    //   .onSnapshot(snapshot => {
-    //     setListOfPhotos(
-    //       snapshot.docs.map(item => {
-    //         return {
-    //           ...item.data(),
-    //           docId: item.id,
-    //         };
-    //       })
-    //     );
-    //   });
     if (photos && photos.length > 0) {
       const { lastDoc } = photos[0];
 
       //storing last Document
       lastDocument.current = lastDoc;
       // console.log(photos);
+      //making realtime Timeline Posts (checking if the first image already exist in the listOfPhotos )
+      //if it exists already do nothing else add it to the TimeLine Component
+      firebase
+        .firestore()
+        .collection('photos')
+        .orderBy('dateCreated', 'desc')
+        .limit(1)
+        .onSnapshot(async snapshot => {
+          const photo = snapshot.docs[0].data();
+          let userLikedPhoto = false;
+          if (photo.likes.includes(user?.uid)) userLikedPhoto = true;
+
+          //in the header of the Post we wanna display the owner of the Post
+          //in the firestore photos schema there is not the username of the Post owner
+          //user = [{username: ..., fullName:...,  ...others}]
+          const [userPhoto] = await getUserByUserId(photo.userId);
+          const { username } = userPhoto;
+
+          // return { username, ...photo, userLikedPhoto, lastDoc };
+
+          if (listOfPhotos) {
+            if (
+              !listOfPhotos.some(
+                photo => photo.docId === snapshot.docs[0].id
+              ) &&
+              !uploadFileLoading &&
+              snapshot.docs[0].data().imageSrc
+            ) {
+              setListOfPhotos(listOfPhotos => [
+                {
+                  ...snapshot.docs[0].data(),
+                  docId: snapshot.docs[0].id,
+                  username,
+                  userLikedPhoto,
+                },
+                ...listOfPhotos,
+              ]);
+            }
+          } else {
+            if (
+              !photos.some(photo => photo.docId === snapshot.docs[0].id) &&
+              !uploadFileLoading &&
+              snapshot.docs[0].data().imageSrc
+            ) {
+              setListOfPhotos(listOfPhotos => [
+                {
+                  ...snapshot.docs[0].data(),
+                  docId: snapshot.docs[0].id,
+                  username,
+                  userLikedPhoto,
+                },
+                ...listOfPhotos,
+              ]);
+            }
+          }
+        });
     }
 
     // console.log('photos', photos);
     setListOfPhotos(photos);
-  }, [photos]);
+
+    // return () => unsubscribe();
+  }, [photos, firebase]);
 
   const observer = useRef();
   const lastPostElementRef = useCallback(

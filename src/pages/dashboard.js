@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 
 import Header from '../components/header';
 import Timeline from '../components/timeline';
+import UploadModal from '../components/upload-modal';
 
 // => '../components/sidebar/index' but index is the entry point so react knows that already without needing to write it
 import Sidebar from '../components/sidebar';
@@ -18,6 +19,7 @@ export default function Dashboard() {
     <UserFirestoreContext.Provider value={{ userFirestore }}>
       <div className="bg-gray-background " id="container">
         <Header />
+        <UploadModal />
         <div className="grid grid-cols-3 gap-4 mx-auto max-w-screen-lg justify-between px-10 mt-24">
           <Timeline />
           <Sidebar />

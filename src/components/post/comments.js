@@ -30,7 +30,7 @@ export default function Comments({
           </p>
         ))}
         <p className=" text-gray-light uppercase text-[10px] mt-2 tracking-wide">
-          {formatDistance(-1 * posted, new Date())} ago
+          {formatDistance(posted, new Date())} ago
         </p>
       </div>
       <AddComment

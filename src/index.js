@@ -1,15 +1,20 @@
-import './wdyr'; // WhyDidYouRender
+// import './wdyr'; // WhyDidYouRender
 
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import FirebaseContext from './context/firebase';
 import { firebase, FieldValue } from './lib/firebase';
+
+import { Provider } from 'react-redux';
+import store from './redux/store';
 import './styles/app.css'; //tailwind css
 
 ReactDOM.render(
   <FirebaseContext.Provider value={{ firebase, FieldValue }}>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </FirebaseContext.Provider>,
   document.getElementById('root')
 );

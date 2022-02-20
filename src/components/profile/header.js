@@ -6,6 +6,8 @@ import UserFirestoreContext from '../../context/user-firestore';
 
 import {
   // isUserFollowingProfile,
+  //https://fond-ecran-manga.fr/wp-content/uploads/2020/06/heroes-450x253.jpg
+  ///images/users/raphael/5.jpg
   toggleFollow,
 } from '../../services/firebase';
 
@@ -81,6 +83,9 @@ export default function Header({
               className=" rounded-full h-40 w-40 flex"
               src={`/images/avatars/${profileUsername}.jpg`}
               alt="profile img"
+              onError={e => {
+                e.target.src = '/images/avatars/default.png';
+              }}
             />
           </div>
           <div className="flex flex-col justify-center items-center col-span-2">
