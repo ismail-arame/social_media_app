@@ -14,8 +14,9 @@ export default function Timeline() {
   const { firebase } = useContext(FirebaseContext);
   const { user } = useContext(UserContext);
   const { photos } = usePhotos();
-  const { userFirestore: { following } = {} } =
-    useContext(UserFirestoreContext);
+  const {
+    userFirestore: { following = [] },
+  } = useContext(UserFirestoreContext);
 
   //uplading File Loading Status
   const uploadFileLoading = useSelector(selectUploadFileLoading, shallowEqual);
@@ -26,22 +27,28 @@ export default function Timeline() {
   // const [lastDocument, setLastDocument] = useState(null);
   let lastDocument = useRef(null);
 
+  let photoUploaded = useRef(null);
+
   const [nextPosts_loading, setNextPostsLoading] = useState(false);
   const [isEmpty, setIsEmpty] = useState(false); //is there any documents in the collection
   //to know whether a user have Followed people posts or no
 
   useEffect(() => {
+    console.log('useEffect', following);
+    console.log('useEffect photos', photos);
     if (photos && photos.length > 0) {
       const { lastDoc } = photos[0];
-
       //storing last Document
       lastDocument.current = lastDoc;
       // console.log(photos);
       //making realtime Timeline Posts (checking if the first image already exist in the listOfPhotos )
       //if it exists already do nothing else add it to the TimeLine Component
-      firebase
+      // unSubscribeFromSnapshot = null;
+
+      const unSubscribeFromSnapshot = firebase
         .firestore()
         .collection('photos')
+        .where('userId', 'in', following)
         .orderBy('dateCreated', 'desc')
         .limit(1)
         .onSnapshot(async snapshot => {
@@ -49,13 +56,8 @@ export default function Timeline() {
           let userLikedPhoto = false;
           if (photo.likes.includes(user?.uid)) userLikedPhoto = true;
 
-          //in the header of the Post we wanna display the owner of the Post
-          //in the firestore photos schema there is not the username of the Post owner
-          //user = [{username: ..., fullName:...,  ...others}]
           const [userPhoto] = await getUserByUserId(photo.userId);
           const { username } = userPhoto;
-
-          // return { username, ...photo, userLikedPhoto, lastDoc };
 
           if (listOfPhotos) {
             if (
@@ -63,8 +65,10 @@ export default function Timeline() {
                 photo => photo.docId === snapshot.docs[0].id
               ) &&
               !uploadFileLoading &&
-              snapshot.docs[0].data().imageSrc
+              snapshot.docs[0].data().imageSrc &&
+              photoUploaded.current !== snapshot.docs[0].id
             ) {
+              photoUploaded.current = snapshot.docs[0].id;
               setListOfPhotos(listOfPhotos => [
                 {
                   ...snapshot.docs[0].data(),
@@ -79,8 +83,10 @@ export default function Timeline() {
             if (
               !photos.some(photo => photo.docId === snapshot.docs[0].id) &&
               !uploadFileLoading &&
-              snapshot.docs[0].data().imageSrc
+              snapshot.docs[0].data().imageSrc &&
+              photoUploaded.current !== snapshot.docs[0].id
             ) {
+              photoUploaded.current = snapshot.docs[0].id;
               setListOfPhotos(listOfPhotos => [
                 {
                   ...snapshot.docs[0].data(),
@@ -92,13 +98,12 @@ export default function Timeline() {
               ]);
             }
           }
+          return () => unSubscribeFromSnapshot();
         });
     }
 
     // console.log('photos', photos);
     setListOfPhotos(photos);
-
-    // return () => unsubscribe();
   }, [photos, firebase]);
 
   const observer = useRef();
@@ -131,12 +136,15 @@ export default function Timeline() {
 
   //Fetching More (INFINTE SCROLL)
   const fetchMore = async userId => {
+    const [{ following }] = await getUserByUserId(userId);
+    console.log('following  FETCH MORE ********', following);
+
     setNextPostsLoading(true); //loading State
     const result = await firebase
       .firestore()
       .collection('photos')
+      .where('userId', 'in', following)
       .orderBy('dateCreated', 'desc')
-      // .where('userId', 'in', following)
       .startAfter(lastDocument.current)
       .limit(3)
       .get();

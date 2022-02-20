@@ -150,7 +150,7 @@ export default function UploadModal() {
                   <img
                     src={selectedUploadFile}
                     alt="selected upload file"
-                    className="w-full object-contain cursor-pointer"
+                    className="w-full object-contain cursor-pointer max-h-96"
                     onClick={() => dispatch(setSelectedUploadFile(null))}
                   />
                 ) : (
@@ -204,7 +204,7 @@ export default function UploadModal() {
                     {uploadFileLoading ? (
                       <svg
                         role="status"
-                        class="inline mr-3 w-4 h-4 text-white animate-spin"
+                        className="inline mr-3 w-4 h-4 text-white animate-spin"
                         viewBox="0 0 100 101"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
