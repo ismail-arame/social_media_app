@@ -51,6 +51,8 @@ module.exports = {
         light: "#868e96",
         transparent: "#b4b4b471",
         lightweight: "#e9ecef",
+        lazy: "#ebe8e8",
+        lazy2: "#f1f3f5",
       },
       red: {
         primary: "#ed4956",

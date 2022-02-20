@@ -150,7 +150,7 @@ export default function UploadModal() {
                   <img
                     src={selectedUploadFile}
                     alt="selected upload file"
-                    className="w-full object-contain cursor-pointer max-h-96"
+                    className="w-full object-contain cursor-pointer max-h-80"
                     onClick={() => dispatch(setSelectedUploadFile(null))}
                   />
                 ) : (

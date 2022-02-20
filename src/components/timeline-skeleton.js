@@ -7,7 +7,7 @@ const TimelineSkeleton = () => {
     <div>
       {[...new Array(2)].map((_, index) => (
         <SkeletonTheme key={index} baseColor="#ebe8e8" highlightColor="#FAFAFA">
-          <div className="rounded  border bg-white border-gray-transparent border-b-2 border-b-white	 translate-y-0.5 rounded-br-none rounded-bl-none">
+          <div className="rounded  border bg-white border-gray-transparent border-b-white	 translate-y-[5px] rounded-br-none rounded-bl-none">
             <div className="flex h-4 p-4 py-8">
               <div className="flex items-center">
                 <div className=" flex items-center">

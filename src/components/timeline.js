@@ -27,6 +27,7 @@ export default function Timeline() {
   // const [lastDocument, setLastDocument] = useState(null);
   let lastDocument = useRef(null);
 
+  //using this Ref t check if a photo uploaded is the same when i change the likes or comments on it (without it thae image uploaded creates another copy of itself (and the reason is setListOfPhotos dosn't set the state unless react re renders))
   let photoUploaded = useRef(null);
 
   const [nextPosts_loading, setNextPostsLoading] = useState(false);

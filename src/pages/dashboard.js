@@ -20,7 +20,7 @@ export default function Dashboard() {
       <div className="bg-gray-background " id="container">
         <Header />
         <UploadModal />
-        <div className="grid grid-cols-3 gap-4 mx-auto max-w-screen-lg justify-between px-10 mt-24">
+        <div className="grid grid-cols-3 gap-6 mx-auto max-w-screen-lg justify-between px-10 mt-24">
           <Timeline />
           <Sidebar />
         </div>
