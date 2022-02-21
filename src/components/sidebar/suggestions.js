@@ -49,6 +49,7 @@ export default function Suggestions({
                 profileId={profile.userId} // userId of the Profile suggested
                 loggedInUserId={loggedInUserId} // userId of the Active User
                 loggedInUserDocId={loggedInUserDocId}
+                profileImageSrc={profile.profileImageSrc}
               />
             );
           })}

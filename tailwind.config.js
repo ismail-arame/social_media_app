@@ -14,6 +14,10 @@ module.exports = {
   },
   theme: {
     extend: {
+      animation: {
+        "pulse-fast": "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "pulse-faster": "pulse 1.4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
       keyframes: {
         wiggle: {
           "0%, 100%": { transform: "rotate(0deg) scale(1)" },

@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import { setOpenUploadModal } from '../redux/upload/upload.actions';
 
@@ -9,10 +9,13 @@ import UserFirestoreContext from '../context/user-firestore';
 import * as ROUTES from '../constants/routes';
 
 import { selectOpenUploadModal } from '../redux/upload/upload.selectors';
+import { selectUploadProfileImageSrc } from '../redux/upload-profile/upload-profile.selectors';
+
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function Header() {
   const {
-    userFirestore: { username },
+    userFirestore: { username, profileImageSrc },
   } = useContext(UserFirestoreContext);
 
   const { firebase } = useContext(FirebaseContext);
@@ -20,7 +23,13 @@ export default function Header() {
   const history = useHistory();
 
   const openUploadModal = useSelector(selectOpenUploadModal, shallowEqual);
+  const uploadProfileImageSrc = useSelector(
+    selectUploadProfileImageSrc,
+    shallowEqual
+  );
   const dispatch = useDispatch();
+
+  const [isLazyLoading, setLazyLoading] = useState(false);
 
   return (
     <header className="h-16 bg-white border-b border-gray-primary mb-8 fixed w-screen top-0 z-20">
@@ -137,14 +146,27 @@ export default function Header() {
                 </button>
                 <div className="flex items-center cursor-pointer">
                   <Link to={`/p/${username}`}>
-                    <img
-                      src={`/images/avatars/${username}.jpg`}
-                      className="flex rounded-full h-8 w-8"
-                      alt={`${username} profile`}
-                      onError={e => {
-                        e.target.src = '/images/avatars/default.png';
-                      }}
-                    />
+                    <div
+                      className={`rounded-full h-8 w-8 transition-colors  ${
+                        isLazyLoading
+                          ? 'bg-gray-lazy2 animate-pulse-faster'
+                          : ''
+                      }`}
+                    >
+                      <LazyLoadImage
+                        width="100%"
+                        height="100%"
+                        effect="opacity"
+                        src={uploadProfileImageSrc}
+                        className="flex rounded-full h-full w-full object-cover border border-gray-transparent"
+                        alt={`${username} profile`}
+                        beforeLoad={() => setLazyLoading(true)}
+                        afterLoad={() => setLazyLoading(false)}
+                        onError={e => {
+                          e.target.src = '/images/avatars/default.png';
+                        }}
+                      />
+                    </div>
                   </Link>
                 </div>
               </>

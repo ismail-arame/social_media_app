@@ -58,7 +58,7 @@ export default function Timeline() {
           if (photo.likes.includes(user?.uid)) userLikedPhoto = true;
 
           const [userPhoto] = await getUserByUserId(photo.userId);
-          const { username } = userPhoto;
+          const { username, profileImageSrc } = userPhoto;
 
           if (listOfPhotos) {
             if (
@@ -75,6 +75,7 @@ export default function Timeline() {
                   ...snapshot.docs[0].data(),
                   docId: snapshot.docs[0].id,
                   username,
+                  profileImageSrc,
                   userLikedPhoto,
                 },
                 ...listOfPhotos,
@@ -93,6 +94,7 @@ export default function Timeline() {
                   ...snapshot.docs[0].data(),
                   docId: snapshot.docs[0].id,
                   username,
+                  profileImageSrc,
                   userLikedPhoto,
                 },
                 ...listOfPhotos,
@@ -167,9 +169,9 @@ export default function Timeline() {
           if (photo.likes.includes(userId)) userLikedPhoto = true;
 
           const [user] = await getUserByUserId(photo.userId);
-          const { username } = user;
+          const { username, profileImageSrc } = user;
 
-          return { username, ...photo, userLikedPhoto };
+          return { username, profileImageSrc, ...photo, userLikedPhoto };
         })
       );
 

@@ -46,6 +46,7 @@ export default function SignUp() {
           .firestore()
           .collection('users')
           .add({
+            profileImageSrc: '/images/avatars/default.jpg',
             userId: createdUserResult.user.uid,
             username: username.toLowerCase(),
             fullName,

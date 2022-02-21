@@ -6,11 +6,24 @@ import * as ROUTES from '../constants/routes';
 import { useContext } from 'react';
 import useUser from '../hooks/use-user';
 import UserFirestoreContext from '../context/user-firestore';
+import firebaseContext from '../context/firebase';
 import Header from '../components/header';
 import UserProfile from '../components/profile';
 
+//Uploading a Post into TimeLine
+import UploadModal from '../components/upload-modal';
+
+//Editing the Profile Picture
+import UploadProfileModal from '../components/upload-profile-modal';
+
+import { useDispatch } from 'react-redux';
+
+import { setUploadProfileImageSrc } from '../redux/upload-profile/upload-profile.actions';
+
 export default function Profile() {
   const { user: userFirestore } = useUser();
+  const { firebase } = useContext(firebaseContext);
+  console.log(firebase);
 
   // NESTED ROUTING => /p/:username
   const { username } = useParams();
@@ -19,10 +32,12 @@ export default function Profile() {
   //the user Profile we are looking for exist or not
   const [user, setUser] = useState(null);
 
+  const dispatch = useDispatch();
   useEffect(() => {
     async function checkUserExists() {
       //if username Exist we get userFirestore data else we get false
       const [user] = await getUserByUsername(username);
+
       if (user?.userId) {
         setUser(user);
       } else {
@@ -31,7 +46,7 @@ export default function Profile() {
     }
 
     checkUserExists();
-  }, [username, history]);
+  }, [username, history, dispatch]);
 
   //REMEMBER If you get an Error complaining about cannot destructuer userFirestore Context
   // then Wrap the Profile Component with the UserFirestoreContext.Provider Component
@@ -40,6 +55,8 @@ export default function Profile() {
     <UserFirestoreContext.Provider value={{ userFirestore }}>
       <div className=" bg-gray-background">
         <Header />
+        <UploadModal />
+        <UploadProfileModal />
         <div className="max-w-screen-lg px-10 mx-auto mt-24">
           <UserProfile user={user} />
         </div>

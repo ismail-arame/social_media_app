@@ -1,14 +1,15 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import propTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import Skeleton, { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
+import { LazyLoadImage } from 'react-lazy-load-image-component';
+
 //showing nice layout of Skeleton when username and fullName are not defined
-const User = ({ username, fullName }) => {
-  // #EFEFEF   ==>  baseColor
-  // #FAFAFA   ==>  highlightColor
-  console.log('i am rendered || User');
+const User = ({ username, fullName, profileImageSrc }) => {
+  const [isLazyLoading, setLazyLoading] = useState(false);
+
   return !username || !fullName ? (
     <div className="grid grid-cols-4 gap-4  mb-12 items-center">
       <div className=" flex justify-between items-center col-span-1">
@@ -25,21 +26,32 @@ const User = ({ username, fullName }) => {
   ) : (
     <Link
       to={`/p/${username}`}
-      className="grid grid-cols-4 gap-4 mb-6 items-center"
+      className="rounded flex items-center justify-start mb-6"
     >
-      <div className=" flex justify-between items-center col-span-1">
-        <img
-          src={`/images/avatars/${username}.jpg`}
-          alt={`${username} profile`}
-          className=" rounded-full w-32 flex mr-3 "
-          onError={e => {
-            e.target.src = '/images/avatars/default.png';
-          }}
-        />
-      </div>
-      <div className=" col-span-3 ">
-        <p className="text-md text-black-light font-bold">{username}</p>
-        <p className=" text-sm text-gray-light">{fullName}</p>
+      <div className=" flex items-center justify-between">
+        <div
+          className={`w-14 h-14 mr-3 rounded-full transition-colors  ${
+            isLazyLoading ? 'bg-gray-lazy2 animate-pulse-faster' : ''
+          }`}
+        >
+          <LazyLoadImage
+            width="100%"
+            height="100%"
+            effect="blur"
+            src={profileImageSrc}
+            alt={`${username} profile`}
+            className="rounded-full w-full h-full flex border border-gray-transparent object-cover"
+            beforeLoad={() => setLazyLoading(true)}
+            afterLoad={() => setLazyLoading(false)}
+            onError={e => {
+              e.target.src = '/images/avatars/default.png';
+            }}
+          />
+        </div>
+        <div className="flex flex-col justify-center">
+          <p className="text-md text-black-light font-bold">{username}</p>
+          <p className=" text-sm text-gray-light">{fullName}</p>
+        </div>
       </div>
     </Link>
   );

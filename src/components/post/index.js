@@ -14,6 +14,7 @@ export default function Post({ content }) {
 
   const {
     username,
+    profileImageSrc,
     imageSrc,
     caption,
     docId,
@@ -25,7 +26,7 @@ export default function Post({ content }) {
 
   return (
     <div className="rounded  border bg-white border-gray-transparent mb-6">
-      <Header username={username} />
+      <Header username={username} profileImageSrc={profileImageSrc} />
       <Image imageSrc={imageSrc} caption={caption} />
       <Actions
         photoDocId={docId}

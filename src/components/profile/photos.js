@@ -5,7 +5,6 @@ import 'react-loading-skeleton/dist/skeleton.css';
 
 //lazy loaded Images
 import { LazyLoadImage } from 'react-lazy-load-image-component';
-import 'react-lazy-load-image-component/src/effects/blur.css';
 import { useState } from 'react';
 
 export default function Photos({ photos }) {
@@ -39,7 +38,7 @@ export default function Photos({ photos }) {
             <div key={photo.docId} className=" relative group">
               <div
                 className={`w-full h-80 transition-colors  ${
-                  isLazyLoading ? 'bg-gray-lazy2 opacity-90' : ''
+                  isLazyLoading ? 'bg-gray-lazy2 animate-pulse-faster' : ''
                 }`}
               >
                 <LazyLoadImage

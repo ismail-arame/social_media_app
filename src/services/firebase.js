@@ -34,6 +34,7 @@ export async function getUserPhotosByUserId(userId) {
     .where('userId', '==', userId)
     .get();
 
+  //WARNING! : => when building pop up component remember to pass in username and profileImageSrc because you will need it (ismail from the past)
   if (!result.empty) {
     return result.docs.map(item => {
       return {
@@ -197,9 +198,9 @@ export async function getPhotos(userId, following) {
       //in the firestore photos schema there is not the username of the Post owner
       //user = [{username: ..., fullName:...,  ...others}]
       const [user] = await getUserByUserId(photo.userId);
-      const { username } = user;
+      const { username, profileImageSrc } = user;
 
-      return { username, ...photo, userLikedPhoto, lastDoc };
+      return { username, profileImageSrc, ...photo, userLikedPhoto, lastDoc };
     })
   );
 

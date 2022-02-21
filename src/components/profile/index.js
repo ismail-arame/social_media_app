@@ -3,6 +3,9 @@ import propTypes from 'prop-types';
 import Header from './header';
 import { getUserPhotosByUserId } from '../../services/firebase';
 import Photos from './photos';
+
+// import { useDispatch } from 'react-redux';
+// import { setUploadProfileImageSrc } from '../../redux/upload-profile/upload-profile.actions';
 //using useReducer for better state handling
 //we pass in the user Profile that we are looking for (not the Active User the Profile Searched)
 
@@ -19,6 +22,7 @@ export default function UserProfile({ user }) {
     reducer,
     INITAIL_STATE
   );
+  // const dispatch = useDispatch();
 
   useEffect(() => {
     async function getProfileInfoAndPhotos() {
