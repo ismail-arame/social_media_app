@@ -13,8 +13,9 @@ export default function AddComment({
   const [comment, setComment] = useState('');
   const { firebase, FieldValue } = useContext(FirebaseContext);
 
+  //Active User username
   const {
-    userFirestore: { username },
+    userFirestore: { username, profileImageSrc },
   } = useContext(UserFirestoreContext);
 
   const handleSubmitComment = async event => {
@@ -22,7 +23,15 @@ export default function AddComment({
 
     //Showing Comments in the Post Components
     // { displayName: username, comment: comment } => ES6 Syntax
-    setComments([...comments, { displayName: username, comment }]);
+    setComments([
+      ...comments,
+      {
+        displayName: username,
+        comment,
+        dateCreated: Date.now(),
+        profileImageSrc,
+      },
+    ]);
 
     //empty the Field
     setComment('');
@@ -33,7 +42,12 @@ export default function AddComment({
       .collection('photos')
       .doc(photoDocId)
       .update({
-        comments: FieldValue.arrayUnion({ displayName: username, comment }),
+        comments: FieldValue.arrayUnion({
+          displayName: username,
+          comment,
+          dateCreated: Date.now(),
+          profileImageSrc,
+        }),
       });
   };
 

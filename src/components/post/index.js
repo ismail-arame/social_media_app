@@ -10,35 +10,30 @@ export default function Post({ content }) {
   console.log(content);
   const commentInput = useRef(null);
 
-  const handleFocus = () => commentInput.current.focus();
+  const handleFocus = () => {
+    commentInput.current.focus();
+    // commentInput.current.value = `@${content.username} `; //for reply Component (Important)
+  };
 
-  const {
-    username,
-    profileImageSrc,
-    imageSrc,
-    caption,
-    docId,
-    userLikedPhoto,
-    likes,
-    dateCreated,
-    comments,
-  } = content;
-
+  //Post Modal when user Clicks on the image (like instagram modal)
   return (
     <div className="rounded  border bg-white border-gray-transparent mb-6">
-      <Header username={username} profileImageSrc={profileImageSrc} />
-      <Image imageSrc={imageSrc} caption={caption} />
+      <Header
+        username={content.username}
+        profileImageSrc={content.profileImageSrc}
+      />
+      <Image content={content} />
       <Actions
-        photoDocId={docId}
-        userLikedPhoto={userLikedPhoto}
-        totalLikes={likes.length}
+        photoDocId={content.docId}
+        userLikedPhoto={content.userLikedPhoto}
+        totalLikes={content.likes.length}
         handleFocus={handleFocus}
       />
-      <Footer username={username} caption={caption} />
+      <Footer username={content.username} caption={content.caption} />
       <Comments
-        photoDocId={docId}
-        comments={comments}
-        posted={dateCreated}
+        photoDocId={content.docId}
+        comments={content.comments}
+        posted={content.dateCreated}
         commentInput={commentInput}
       />
     </div>

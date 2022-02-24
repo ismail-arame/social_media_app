@@ -42,7 +42,6 @@ export default function Comments({
     </>
   );
 }
-//because i made timestamps negative in the database for decreasing order purposes
 
 Comments.propTypes = {
   photoDocId: propTypes.string.isRequired,

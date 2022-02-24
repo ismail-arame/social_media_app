@@ -8,6 +8,7 @@ import UploadModal from '../components/upload-modal';
 import Sidebar from '../components/sidebar';
 import useUser from '../hooks/use-user';
 import UserFirestoreContext from '../context/user-firestore';
+// import PostModal from '../components/post-modal';
 
 export default function Dashboard() {
   useEffect(() => {

@@ -1,13 +1,10 @@
-import { Suspense, lazy } from 'react';
+import { lazy } from 'react';
 import {
-  BrowserRouter as Router,
   Route,
   Switch,
+  useLocation,
+  useRouteMatch,
 } from 'react-router-dom/cjs/react-router-dom.min';
-
-//react-loader-spinner LIBRARY
-import 'react-loader-spinner/dist/loader/css/react-spinner-loader.css';
-import { Triangle } from 'react-loader-spinner';
 
 // import Spinner from './components/spinner/spinner.component';
 
@@ -25,6 +22,8 @@ import UserContext from './context/user';
 import 'react-lazy-load-image-component/src/effects/blur.css';
 import 'react-lazy-load-image-component/src/effects/opacity.css';
 
+import PostModal from './components/post-modal/post-modal';
+
 // => Code Splitting :
 const Login = lazy(() => import('./pages/login'));
 const SignUp = lazy(() => import('./pages/sign-up'));
@@ -35,6 +34,9 @@ const Profile = lazy(() => import('./pages/profile'));
 export default function App() {
   const { user } = useAuthListener();
   const dispatch = useDispatch();
+  const match = useRouteMatch();
+  const location = useLocation();
+  const background = location.state && location.state.background;
 
   useEffect(() => {
     const getUserData = async () => {
@@ -45,49 +47,37 @@ export default function App() {
     getUserData();
   }, [user, dispatch]);
 
+  // location={postModalOpen ? background : location} => not good it will re render the Dshboard ROUTE once we remove the modal
   return (
     <UserContext.Provider value={{ user }}>
-      <Router>
-        <Suspense
-          fallback={
-            <div className="h-screen w-screen flex flex-col gap-2 items-center justify-center">
-              <Triangle
-                height="200"
-                width="200"
-                color="#4b5563"
-                ariaLabel="loading"
-              />
-              <p className="text-2xl font-semibold text-black-light animate-pulse-fast">
-                LOADING...
-              </p>
-            </div>
-          }
+      <Switch location={background || location}>
+        <IsUserLoggedIN
+          user={user}
+          loggedInPath={ROUTES.DASHBOARD}
+          exact
+          path={ROUTES.LOGIN}
         >
-          <Switch>
-            <IsUserLoggedIN
-              user={user}
-              loggedInPath={ROUTES.DASHBOARD}
-              exact
-              path={ROUTES.LOGIN}
-            >
-              <Login />
-            </IsUserLoggedIN>
-            <IsUserLoggedIN
-              user={user}
-              loggedInPath={ROUTES.DASHBOARD}
-              exact
-              path={ROUTES.SIGN_UP}
-            >
-              <SignUp />
-            </IsUserLoggedIN>
-            <Route path={ROUTES.PROFILE} component={Profile} />
-            <ProtectedRoute user={user} exact path={ROUTES.DASHBOARD}>
-              <Dashboard />
-            </ProtectedRoute>
-            <Route component={NotFound} />
-          </Switch>
-        </Suspense>
-      </Router>
+          <Login />
+        </IsUserLoggedIN>
+        <IsUserLoggedIN
+          user={user}
+          loggedInPath={ROUTES.DASHBOARD}
+          exact
+          path={ROUTES.SIGN_UP}
+        >
+          <SignUp />
+        </IsUserLoggedIN>
+        <Route path={ROUTES.PROFILE} component={Profile} />
+        <ProtectedRoute user={user} exact path={ROUTES.DASHBOARD}>
+          <Dashboard />
+        </ProtectedRoute>
+        <Route component={NotFound} />
+      </Switch>
+
+      {/* check GOOGLE => HOW TO MAKE ROUTABLE MODALS (NOBODY KNOWS EVERYTHING hhhh) */}
+      {background && (
+        <Route path={`${match.url}${ROUTES.POST}`} children={<PostModal />} />
+      )}
     </UserContext.Provider>
   );
 }

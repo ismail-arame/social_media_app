@@ -11,7 +11,14 @@ export default function ProtectedRoute({ user, children, ...rest }) {
         if (user) return children;
 
         if (!user) {
-          return <Redirect to={ROUTES.LOGIN} />;
+          return (
+            <Redirect
+              to={{
+                pathname: ROUTES.LOGIN,
+                state: { from: location },
+              }}
+            />
+          );
         }
 
         return null;

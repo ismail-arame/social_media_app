@@ -1,3 +1,5 @@
+//updating the Active User profile Image
+
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { useRef, useContext } from 'react';
 import UserFirestoreContext from '../context/user-firestore';
@@ -7,7 +9,7 @@ import { CameraIcon } from '@heroicons/react/outline';
 import { Dialog, Transition } from '@headlessui/react';
 import { Fragment } from 'react';
 
-import { firebase, FieldValue } from '../lib/firebase';
+import { firebase } from '../lib/firebase';
 
 //upload selectors
 import {
@@ -28,7 +30,6 @@ export default function UploadProfileModal() {
   const { userFirestore } = useContext(UserFirestoreContext);
 
   const filePickerRef = useRef(null);
-  //   const captionRef = useRef(null);
 
   const openUploadProfileModal = useSelector(
     selectOpenUploadProfileModal,
@@ -70,11 +71,6 @@ export default function UploadProfileModal() {
     dispatch(setUploadProfileFileLoading());
 
     const storage = firebase.storage();
-
-    // 1) create a post and add to Firestore 'photos' collection
-    // 2) get the post ID of the newly created post
-    // 3) upload the image to firebase storage with the post ID
-    // 4) get a download URL from the firebase storage and update the original post with image
 
     // 1)
     // we'll get the querySnapshot (Collection Snapshot)
