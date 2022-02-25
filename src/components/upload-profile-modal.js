@@ -157,6 +157,7 @@ export default function UploadProfileModal() {
       'profileImageSrc : **',
       newResultDocRef.docs[0].data().profileImageSrc
     );
+
     if (newResultDocRef.docs[0].data().profileImageSrc) {
       dispatch(
         setUploadProfileImageSrc(newResultDocRef.docs[0].data().profileImageSrc)

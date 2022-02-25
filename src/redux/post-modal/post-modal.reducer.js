@@ -2,6 +2,8 @@ import postModalActionTypes from './post-modal.types';
 const INITIAL_STATE = {
   postModalOpen: false,
   postModalContent: null,
+  toggleLiked: false,
+  likes: 0,
 };
 
 const postModalReducer = (state = INITIAL_STATE, action) => {
@@ -16,6 +18,18 @@ const postModalReducer = (state = INITIAL_STATE, action) => {
       return {
         ...state,
         postModalContent: action.payload,
+      };
+
+    case postModalActionTypes.SET_TOGGLE_LIKED:
+      return {
+        ...state,
+        toggleLiked: action.payload,
+      };
+
+    case postModalActionTypes.SET_LIKES:
+      return {
+        ...state,
+        likes: action.payload,
       };
 
     default:

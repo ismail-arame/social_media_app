@@ -17,6 +17,7 @@ module.exports = {
       maxHeight: {
         postModalHeight: "90vh",
         postModalWidth: "70vw",
+        commentSectionHeight: "51vh",
       },
       animation: {
         "pulse-fast": "pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite",

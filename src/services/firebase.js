@@ -250,3 +250,43 @@ export async function getPhotos(userId, following) {
 
 //   return photosWithUserDetails;
 // }
+
+export async function getPhotoByDateCreatedAndImageSrc(
+  dateCreated,
+  imageSrc,
+  activeUserId
+) {
+  const result = await firebase
+    .firestore()
+    .collection('photos')
+    .where('dateCreated', '==', dateCreated)
+    .where('imageSrc', '==', imageSrc)
+    .get();
+
+  const userPostPhoto = result.docs.map(photo => {
+    return {
+      ...photo.data(),
+      docId: photo.id,
+    };
+  });
+
+  const photosWithUserDetails = await Promise.all(
+    userPostPhoto.map(async photo => {
+      let userLikedPhoto = false;
+      if (photo.likes.includes(activeUserId)) userLikedPhoto = true;
+
+      //in the header of the Post we wanna display the owner of the Post
+      //in the firestore photos schema there is not the username of the Post owner
+      //user = [{username: ..., fullName:...,  ...others}]
+      const [user] = await getUserByUserId(photo.userId);
+      const { username, profileImageSrc } = user;
+
+      return { username, profileImageSrc, ...photo, userLikedPhoto };
+    })
+  );
+
+  //if the active user have not followed anyone we have to stop the skeleton loading and tell him to follow people
+
+  console.log('photosWithUserDetails', photosWithUserDetails);
+  return photosWithUserDetails;
+}

@@ -204,11 +204,17 @@ export default function Timeline() {
             if (listOfPhotos.length === index + 1) {
               return (
                 <div key={content.docId} ref={lastPostElementRef}>
-                  <Post content={content} />
+                  <Post content={content} activeUserId={user.uid} />
                 </div>
               );
             } else {
-              return <Post key={content.docId} content={content} />;
+              return (
+                <Post
+                  key={content.docId}
+                  content={content}
+                  activeUserId={user.uid}
+                />
+              );
             }
           })}
           {nextPosts_loading ? (

@@ -1,8 +1,9 @@
 import propTypes from 'prop-types';
-import { useState } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { formatDistance } from 'date-fns';
 import { Link } from 'react-router-dom';
 import AddComment from './add-comment';
+import FirebaseContext from '../../context/firebase';
 
 export default function Comments({
   photoDocId,
@@ -11,8 +12,23 @@ export default function Comments({
   commentInput,
 }) {
   //comments is just a name to explain what we are storing in the state
+  const { firebase } = useContext(FirebaseContext);
 
   const [comments, setComments] = useState(allComments);
+
+  useEffect(() => {
+    //Realitime Comment Functionality
+    const unSubscribeFromSnapshot = firebase
+      .firestore()
+      .collection('photos')
+      .doc(photoDocId)
+      .onSnapshot(snapshot => {
+        setComments(snapshot.data().comments);
+      });
+
+    return () => unSubscribeFromSnapshot();
+  }, [firebase, photoDocId]);
+
   return (
     <>
       <div className=" p-4 pt-1 pb-4 ">

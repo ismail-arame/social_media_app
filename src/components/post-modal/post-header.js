@@ -1,4 +1,6 @@
+import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { setPostModalOpen } from '../../redux/post-modal/post-modal.actions';
 
 export default function PostModalHeader({
   postUserUsername,
@@ -8,18 +10,22 @@ export default function PostModalHeader({
   isFollowingProfile,
   handleToggleFollow,
 }) {
+  const dispatch = useDispatch();
   return (
-    <header className="flex items-center h-8 border-b border-gray-transparent py-8 px-4">
+    <header className="flex items-center h-8 border-b border-gray-lightweight py-8 px-4">
       <div className="w-11 h-11 rounded-full mr-3">
         <img
           src={postUserProfileImageSrc}
           alt={`${postUserUsername} img`}
-          className="rounded-full w-full h-full border border-gray-transparent object-cover
+          className="rounded-full w-full h-full border border-gray-lightweight object-cover
 "
         />
       </div>
       <div className="flex flex-col justify-center mr-5">
-        <Link to={`/p/${postUserUsername}`}>
+        <Link
+          to={`/p/${postUserUsername}`}
+          onClick={() => dispatch(setPostModalOpen())}
+        >
           <p className=" font-semibold text-sm text-black-light">
             {postUserUsername}
           </p>

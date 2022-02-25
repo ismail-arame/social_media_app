@@ -1,45 +1,24 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useContext } from 'react';
 import propTypes from 'prop-types';
 import FirebaseContext from '../../context/firebase';
 import UserContext from '../../context/user';
 
-export default function Actions({
+export default function PostModalActions({
   photoDocId,
   totalLikes,
   userLikedPhoto,
-  handleFocus,
-  activeUserId,
+  //   handleFocus,
 }) {
   const {
     user: { uid: userId = '' },
   } = useContext(UserContext);
   // console.log('userId', userId);
-  const { firebase, FieldValue } = useContext(FirebaseContext);
-
   const [toggleLiked, setToggleLiked] = useState(userLikedPhoto);
   const [likes, setLikes] = useState(totalLikes);
-
-  useEffect(() => {
-    //Realitime Like Functionality
-    const unSubscribeFromSnapshot = firebase
-      .firestore()
-      .collection('photos')
-      .doc(photoDocId)
-      .onSnapshot(snapshot => {
-        setLikes(snapshot.data().likes.length);
-
-        if (snapshot.data().likes.includes(activeUserId)) {
-          setToggleLiked(true);
-        } else {
-          setToggleLiked(false);
-        }
-      });
-
-    return () => unSubscribeFromSnapshot();
-  }, [firebase, activeUserId, photoDocId]);
+  const { firebase, FieldValue } = useContext(FirebaseContext);
 
   const handleToggleLiked = async () => {
-    // setToggleLiked(toggleLiked => !toggleLiked);
+    setToggleLiked(toggleLiked => !toggleLiked);
 
     console.log(photoDocId);
     console.log(toggleLiked);
@@ -56,7 +35,7 @@ export default function Actions({
           : FieldValue.arrayUnion(userId),
       });
 
-    // setLikes(toggleLiked ? likes - 1 : likes + 1);
+    setLikes(toggleLiked ? likes - 1 : likes + 1);
   };
 
   return (
@@ -89,12 +68,12 @@ export default function Actions({
             />
           </svg>
           <svg
-            onClick={handleFocus}
-            onKeyDown={event => {
-              if (event.key === 'Enter') {
-                handleFocus();
-              }
-            }}
+            // onClick={handleFocus}
+            // onKeyDown={event => {
+            //   if (event.key === 'Enter') {
+            //     handleFocus();
+            //   }
+            // }}
             className="w-8 text-black-light select-none cursor-pointer transition-colors focus:outline-none hover:text-gray-light hover:animate-[bounceModified_1.4s_linear]"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
@@ -124,9 +103,10 @@ export default function Actions({
   );
 }
 
-Actions.propTypes = {
+PostModalActions.propTypes = {
   photoDocId: propTypes.string.isRequired,
   totalLikes: propTypes.number.isRequired,
   userLikedPhoto: propTypes.bool.isRequired,
-  handleFocus: propTypes.func.isRequired,
 };
+
+// handleFocus: propTypes.func.isRequired,

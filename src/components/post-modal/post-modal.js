@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 // import { useRef, useContext, useState } from 'react';
@@ -10,7 +10,11 @@ import {
   selectPostModalContent,
 } from '../../redux/post-modal/post-modal.selectors';
 
-import { getUserByUserId, toggleFollow } from '../../services/firebase';
+import {
+  getUserByUserId,
+  toggleFollow,
+  getPhotoByDateCreatedAndImageSrc,
+} from '../../services/firebase';
 
 //https://headlessui.dev and see there docs there
 import { Dialog, Transition } from '@headlessui/react';
@@ -20,16 +24,26 @@ import PostModalImage from './post-image';
 //Skeleton
 import Skeleton from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
+
 import useUser from '../../hooks/use-user';
+
 import PostModalHeader from './post-header';
 import PostModalCaptionComment from './post-caption-comment';
+import Actions from '../post/actions';
+
+import UserFirestoreContext from '../../context/user-firestore';
 
 //Date Formatting
 import { formatDistance } from 'date-fns';
 
 export default function PostModal() {
+  const commentInput = useRef(null);
+
+  const handleFocus = () => commentInput.current.focus();
+
   //getting the post Owner DATA
   const [postUser, setPostUser] = useState(null);
+  const [postData, setPostData] = useState(null);
   const [isFollowingProfile, setIsFollowingProfile] = useState(false);
 
   const { user: userFirestore } = useUser();
@@ -63,7 +77,17 @@ export default function PostModal() {
       setPostUser(response);
     };
 
+    const getPostData = async () => {
+      const [response] = await getPhotoByDateCreatedAndImageSrc(
+        postModalContent.dateCreated,
+        postModalContent.imageSrc,
+        userFirestore.userId
+      );
+      setPostData(response);
+    };
+
     if (postModalContent?.userId) getPostUser();
+    if (userFirestore?.userId) getPostData();
 
     const isLoggedInUserFollowingProfile = () => {
       const isFollowing = userFirestore.following.includes(
@@ -80,11 +104,13 @@ export default function PostModal() {
     }
   }, [postModalContent, userFirestore]);
 
+  console.log('postData', postData);
+  console.log('postUser', postUser);
   return (
     <Transition.Root show={postModalOpen} as={Fragment}>
       <Dialog
         as="div"
-        className="fixed inset-0 z-40 overflow-y-hidden max-w-5xl my-auto max-h-postModalHeight mx-auto px-6"
+        className="fixed inset-0 z-40 overflow-y-hidden max-w-[1100px] my-auto max-h-postModalHeight mx-auto px-6"
         onClose={() => {
           dispatch(setPostModalOpen());
           history.goBack();
@@ -104,10 +130,7 @@ export default function PostModal() {
           </Transition.Child>
 
           {/* This element is to trick the browser into centering the modal contents. */}
-          <span
-            className="hidden sm:inline-block sm:h-screen sm:align-middle"
-            aria-hidden="true"
-          >
+          <span className="hidden  sm:align-middle" aria-hidden="true">
             &#8203;
           </span>
           <Transition.Child
@@ -119,36 +142,45 @@ export default function PostModal() {
             leaveFrom="opacity-100 translate-y-0 scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 scale-95"
           >
-            <div className="inline-block w-full h-full overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-tr-md rounded-br-md">
+            <div className="inline-block w-full h-full overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl rounded-tr rounded-br">
               {/* everything about the POST MODAL will be written here  */}
-              <div className="w-full h-full grid grid-cols-10">
-                <div className="col-span-5 h-full">
+              <div className="w-full h-full grid grid-cols-9">
+                <div className="col-span-4 max-h-postModalHeight">
                   <PostModalImage
                     imageSrc={postModalContent.imageSrc}
                     username={postModalContent.username}
                   />
                 </div>
-                <div className="col-span-5 h-full">
-                  {!postUser || !userFirestore ? (
+                <div className="col-span-5 max-h-postModalHeight relative">
+                  {!postUser || !userFirestore || !postData ? (
                     <Skeleton count={1} width={100} height={60} />
                   ) : (
-                    <div className="flex flex-col h-full">
-                      <PostModalHeader
-                        postUserUsername={postUser.username}
-                        postUserFullName={postUser.fullName}
-                        postUserProfileImageSrc={postUser.profileImageSrc}
-                        activeBtnFollow={activeBtnFollow}
-                        isFollowingProfile={isFollowingProfile}
-                        handleToggleFollow={handleToggleFollow}
-                      />
-                      <PostModalCaptionComment
-                        postUserProfileImageSrc={postUser.profileImageSrc}
-                        postUserUsername={postUser.username}
-                        caption={postModalContent.caption}
-                        posted={postModalContent.dateCreated}
-                        comments={postModalContent.comments}
-                      />
-                    </div>
+                    <UserFirestoreContext.Provider value={{ userFirestore }}>
+                      <div className="grid auto-rows-min h-full">
+                        <PostModalHeader
+                          postUserUsername={postUser.username}
+                          postUserFullName={postUser.fullName}
+                          postUserProfileImageSrc={postUser.profileImageSrc}
+                          activeBtnFollow={activeBtnFollow}
+                          isFollowingProfile={isFollowingProfile}
+                          handleToggleFollow={handleToggleFollow}
+                        />
+                        <PostModalCaptionComment
+                          photoDocId={postData.docId}
+                          postUserProfileImageSrc={postUser.profileImageSrc}
+                          postUserUsername={postUser.username}
+                          caption={postData.caption}
+                          posted={postData.dateCreated}
+                          comments={postData.comments}
+                          commentInput={commentInput}
+                          //actions
+                          totalLikes={postData.likes.length}
+                          userLikedPhoto={postData.userLikedPhoto}
+                          handleFocus={handleFocus}
+                          activeUserId={userFirestore.userId}
+                        />
+                      </div>
+                    </UserFirestoreContext.Provider>
                   )}
                 </div>
               </div>

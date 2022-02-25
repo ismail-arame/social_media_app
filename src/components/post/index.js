@@ -6,7 +6,7 @@ import Actions from './actions';
 import Footer from './footer';
 import Comments from './comments';
 
-export default function Post({ content }) {
+export default function Post({ content, activeUserId }) {
   console.log(content);
   const commentInput = useRef(null);
 
@@ -28,6 +28,7 @@ export default function Post({ content }) {
         userLikedPhoto={content.userLikedPhoto}
         totalLikes={content.likes.length}
         handleFocus={handleFocus}
+        activeUserId={activeUserId}
       />
       <Footer username={content.username} caption={content.caption} />
       <Comments

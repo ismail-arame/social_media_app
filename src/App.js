@@ -7,6 +7,7 @@ import {
 } from 'react-router-dom/cjs/react-router-dom.min';
 
 // import Spinner from './components/spinner/spinner.component';
+import './app.css';
 
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -75,9 +76,7 @@ export default function App() {
       </Switch>
 
       {/* check GOOGLE => HOW TO MAKE ROUTABLE MODALS (NOBODY KNOWS EVERYTHING hhhh) */}
-      {background && (
-        <Route path={`${match.url}${ROUTES.POST}`} children={<PostModal />} />
-      )}
+      {background && <Route path={ROUTES.POST} children={<PostModal />} />}
     </UserContext.Provider>
   );
 }

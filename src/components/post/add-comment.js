@@ -1,4 +1,4 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import propTypes from 'prop-types';
 import FirebaseContext from '../../context/firebase';
 import UserFirestoreContext from '../../context/user-firestore';
@@ -17,6 +17,8 @@ export default function AddComment({
   const {
     userFirestore: { username, profileImageSrc },
   } = useContext(UserFirestoreContext);
+
+  console.log('userFirestore', username);
 
   const handleSubmitComment = async event => {
     event.preventDefault();

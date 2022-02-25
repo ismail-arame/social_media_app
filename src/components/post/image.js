@@ -17,7 +17,7 @@ export default function Image({ content }) {
   return (
     <Link
       to={{
-        pathname: `${match.url}post/${content.docId}`,
+        pathname: `/post/${content.docId}`,
         //we store the Previous Location in the background
         state: { background: location },
       }}
