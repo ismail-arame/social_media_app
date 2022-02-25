@@ -35,6 +35,7 @@ import UserFirestoreContext from '../../context/user-firestore';
 
 //Date Formatting
 import { formatDistance } from 'date-fns';
+import PostModalSkeleton from './post-modal-skeleton';
 
 export default function PostModal() {
   const commentInput = useRef(null);
@@ -153,7 +154,7 @@ export default function PostModal() {
                 </div>
                 <div className="col-span-5 max-h-postModalHeight relative">
                   {!postUser || !userFirestore || !postData ? (
-                    <Skeleton count={1} width={100} height={60} />
+                    <PostModalSkeleton />
                   ) : (
                     <UserFirestoreContext.Provider value={{ userFirestore }}>
                       <div className="grid auto-rows-min h-full">
