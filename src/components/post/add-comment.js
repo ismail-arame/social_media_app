@@ -49,6 +49,7 @@ export default function AddComment({
           comment,
           dateCreated: Date.now(),
           profileImageSrc,
+          commentLikes: [],
         }),
       });
   };

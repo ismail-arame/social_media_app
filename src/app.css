@@ -8,3 +8,8 @@
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(rgba(167, 167, 167, 0.212), rgb(56, 56, 56));
 }
+
+::-webkit-scrollbar-thumb {
+  min-height: 70px;
+  max-height: 150px;
+}
