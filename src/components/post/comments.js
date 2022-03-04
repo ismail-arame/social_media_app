@@ -37,10 +37,12 @@ export default function Comments({
             View all {comments.length} comments
           </p>
         )}
-        {comments.slice(0, 3).map(item => (
+        {comments.slice(0, 2).map(item => (
           <p key={`${item.comment}-${item.displayName}`} className="mb-1">
             <Link to={`/p/${item.displayName}`}>
-              <span className="mr-1 font-semibold">{item.displayName}</span>
+              <span className="mr-1 font-semibold text-sm">
+                {item.displayName}
+              </span>
             </Link>
             <span className="text-black-light text-sm">{item.comment}</span>
           </p>

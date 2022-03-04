@@ -12,6 +12,13 @@ import { selectOpenUploadModal } from '../redux/upload/upload.selectors';
 import { selectUploadProfileImageSrc } from '../redux/upload-profile/upload-profile.selectors';
 
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+import InputSearchUsers from './input-search/input-search-users';
+import InputSearchCardlist from './input-search/input-search-cardlist';
+import TriangleShape from './input-search/triangle-shape';
+
+import Skeleton from 'react-loading-skeleton';
+import { SkeletonTheme } from 'react-loading-skeleton';
+import 'react-loading-skeleton/dist/skeleton.css';
 
 export default function Header() {
   const {
@@ -31,6 +38,40 @@ export default function Header() {
 
   const [isLazyLoading, setLazyLoading] = useState(false);
 
+  const [searchedUserQuery, setSearchedUserQuery] = useState('');
+  const [users, setUsers] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  //show and hide the search cardlist
+  const [isClickedOutsidCardlist, setClickedOutsideCardlist] = useState(false);
+  const [isFocusOnInput, setFocusOnInput] = useState(false);
+
+  const getUsers = async () => {
+    setLoading(true);
+    const result = await firebase.firestore().collection('users').get();
+    const usersData = result.docs.map(user => ({
+      ...user.data(),
+      id: user.id,
+    }));
+
+    console.log('usersData', usersData);
+    //caching the data in the state so next time user search for a user the results will be much faster
+    setUsers(usersData);
+    setLoading(false);
+  };
+
+  const handleChange = e => {
+    setSearchedUserQuery(e.target.value);
+    if (!users) {
+      getUsers();
+    }
+  };
+
+  const filtredUsers = users?.filter(user =>
+    user.username.toLowerCase().includes(searchedUserQuery.toLowerCase())
+  );
+  // console.log('fitredUsers', filtredUsers);
+
   return (
     <header className="h-16 bg-white border-b border-gray-primary mb-8 fixed w-screen top-0 z-20">
       <div className=" container mx-auto max-w-screen-lg h-full px-10">
@@ -46,6 +87,25 @@ export default function Header() {
               </Link>
             </h1>
           </div>
+          <div className="self-center">
+            <InputSearchUsers
+              handleChange={handleChange}
+              searchedUserQuery={searchedUserQuery}
+              setClickedOutsideCardlist={setClickedOutsideCardlist}
+              setFocusOnInput={setFocusOnInput}
+            />
+          </div>
+          {!isClickedOutsidCardlist && isFocusOnInput ? (
+            <>
+              <InputSearchCardlist
+                users={filtredUsers}
+                searchedUserQuery={searchedUserQuery}
+                loading={loading}
+                setClickedOutsideCardlist={setClickedOutsideCardlist}
+              />
+              <TriangleShape />
+            </>
+          ) : null}
           <div className="text-gray-700 text-center flex items-center ">
             {username ? (
               <>
@@ -172,22 +232,38 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link to={ROUTES.LOGIN}>
-                  <button
-                    type="button"
-                    className=" bg-blue-light font-semibold text-sm rounded text-white w-16 h-8 mr-2"
-                  >
-                    Log In
-                  </button>
-                </Link>
-                <Link to={ROUTES.SIGN_UP}>
-                  <button
-                    type="button"
-                    className=" font-semibold text-sm rounded text-blue-light w-16 h-8"
-                  >
-                    Sign Up
-                  </button>
-                </Link>
+                <Skeleton
+                  count={1}
+                  width={32}
+                  height={32}
+                  circle="true"
+                  duration={1}
+                  className="h-full w-full mb-1 mr-6"
+                />
+                <Skeleton
+                  count={1}
+                  width={32}
+                  height={32}
+                  circle="true"
+                  duration={1}
+                  className="h-full w-full mb-1 mr-6"
+                />
+                <Skeleton
+                  count={1}
+                  width={32}
+                  height={32}
+                  circle="true"
+                  duration={1}
+                  className="h-full w-full mb-1 mr-6"
+                />
+                <Skeleton
+                  count={1}
+                  width={32}
+                  height={32}
+                  circle="true"
+                  duration={1}
+                  className="h-full w-full mb-1 "
+                />
               </>
             )}
           </div>

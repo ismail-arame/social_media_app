@@ -13,7 +13,7 @@ export default function PostModalHeader({
   const dispatch = useDispatch();
   return (
     <header className="flex items-center h-8 border-b border-gray-lightweight py-8 px-4">
-      <div className="w-11 h-11 rounded-full mr-3">
+      <div className="w-11 h-11 rounded-full mr-4">
         <img
           src={postUserProfileImageSrc}
           alt={`${postUserUsername} img`}

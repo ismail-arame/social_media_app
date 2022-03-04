@@ -8,6 +8,9 @@ export default function AddComment({
   commentInput,
   comments, // from the useState in comments.js file
   setComments, // from the useState in comments.js file
+  isReplyComment,
+  replyComment, //data abut the comment that we wanna reply
+  replyComment2,
 }) {
   //the comment that the active user will post
   const [comment, setComment] = useState('');
@@ -23,35 +26,91 @@ export default function AddComment({
   const handleSubmitComment = async event => {
     event.preventDefault();
 
-    //Showing Comments in the Post Components
-    // { displayName: username, comment: comment } => ES6 Syntax
-    setComments([
-      ...comments,
-      {
-        displayName: username,
-        comment,
-        dateCreated: Date.now(),
-        profileImageSrc,
-      },
-    ]);
-
-    //empty the Field
-    setComment('');
-
-    //Adding Comments to Firestore Database
-    return firebase
-      .firestore()
-      .collection('photos')
-      .doc(photoDocId)
-      .update({
-        comments: FieldValue.arrayUnion({
+    if (!isReplyComment?.current) {
+      //Showing Comments in the Post Components
+      // { displayName: username, comment: comment } => ES6 Syntax
+      setComments([
+        ...comments,
+        {
           displayName: username,
           comment,
           dateCreated: Date.now(),
           profileImageSrc,
-          commentLikes: [],
-        }),
+        },
+      ]);
+
+      //empty the Field
+      setComment('');
+
+      //Adding Comments to Firestore Database
+      return firebase
+        .firestore()
+        .collection('photos')
+        .doc(photoDocId)
+        .update({
+          comments: FieldValue.arrayUnion({
+            displayName: username,
+            comment,
+            dateCreated: Date.now(),
+            profileImageSrc,
+            commentLikes: [],
+            replies: [],
+            isReplyShow: false,
+          }),
+        });
+    } else {
+      console.log('replyComment2.current', replyComment2.current);
+      const newUpdatedComments = [];
+
+      console.log(comments, replyComment2.current);
+      comments.forEach(item => {
+        if (
+          (item.displayName === replyComment.current?.displayName &&
+            item.dateCreated === replyComment.current?.dateCreated) ||
+          (item.displayName === replyComment2.current?.displayName &&
+            item.dateCreated === replyComment2.current?.dateCreated)
+        ) {
+          newUpdatedComments.push({
+            displayName: item.displayName,
+            comment: item.comment,
+            dateCreated: item.dateCreated,
+            profileImageSrc: item.profileImageSrc,
+            commentLikes: item.commentLikes,
+            replies: [
+              ...item.replies,
+              {
+                displayName: username,
+                comment,
+                dateCreated: Date.now(),
+                replyLikes: [],
+                profileImageSrc,
+              },
+            ],
+            isReplyShow: item.isReplyShow,
+          });
+        } else {
+          newUpdatedComments.push({
+            displayName: item.displayName,
+            comment: item.comment,
+            dateCreated: item.dateCreated,
+            profileImageSrc: item.profileImageSrc,
+            commentLikes: item.commentLikes,
+            replies: item.replies,
+            isReplyShow: item.isReplyShow,
+          });
+        }
       });
+
+      console.log('newUpdatedComments', newUpdatedComments);
+      isReplyComment.current = false;
+      replyComment.current = null;
+      replyComment2.current = null;
+      setComment('');
+
+      return firebase.firestore().collection('photos').doc(photoDocId).update({
+        comments: newUpdatedComments,
+      });
+    }
   };
 
   return (

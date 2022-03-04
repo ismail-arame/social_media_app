@@ -38,7 +38,7 @@ import { formatDistance } from 'date-fns';
 import PostModalSkeleton from './post-modal-skeleton';
 
 export default function PostModal() {
-  const commentInput = useRef(null);
+  const commentInput = useRef(null); //when we click on comment svg
 
   const handleFocus = () => commentInput.current.focus();
 

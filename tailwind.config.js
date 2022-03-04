@@ -62,6 +62,8 @@ module.exports = {
         lightweight: "#e9ecef",
         lazy: "#ebe8e8",
         lazy2: "#f1f3f5",
+        search: "#efefef",
+        searchHover: "#f8f9fa",
       },
       red: {
         primary: "#ed4956",

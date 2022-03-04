@@ -68,7 +68,10 @@ export default function App() {
         >
           <SignUp />
         </IsUserLoggedIN>
-        <Route path={ROUTES.PROFILE} component={Profile} />
+        <ProtectedRoute user={user} exact path={ROUTES.PROFILE}>
+          <Profile />
+        </ProtectedRoute>
+
         <ProtectedRoute user={user} exact path={ROUTES.DASHBOARD}>
           <Dashboard />
         </ProtectedRoute>
