@@ -1,11 +1,14 @@
 import { useState, useEffect } from 'react';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 import { toggleFollow, getUserByUserId } from '../../services/firebase';
+import { Link } from 'react-router-dom';
 
-import { useSelector, shallowEqual } from 'react-redux';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { selectLikesModalOpen } from '../../redux/likes-modal/likes-modal.selectors';
+import { setLikesModalOpen } from '../../redux/likes-modal/likes-modal.actions';
 
 export default function LikesDetail({ loggedInUser, likesUser }) {
+  const dispatch = useDispatch();
   const [isLoading, setLoading] = useState(false);
   const [isFollowingProfile, setIsFollowingProfile] = useState(false);
   const [isLazyLoading, setLazyLoading] = useState(false);
@@ -66,9 +69,14 @@ export default function LikesDetail({ loggedInUser, likesUser }) {
           />
         </div>
         <div className="flex flex-col justify-center">
-          <p className=" font-semibold text-sm text-black-light">
-            {likesUser.username}
-          </p>
+          <Link
+            to={`/p/${likesUser.username}`}
+            onClick={() => dispatch(setLikesModalOpen())}
+          >
+            <p className=" font-semibold text-sm text-black-light">
+              {likesUser.username}
+            </p>
+          </Link>
           <p className="text-xs text-gray-light">{likesUser.fullName}</p>
         </div>
       </div>

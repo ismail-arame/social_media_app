@@ -71,7 +71,7 @@ export default function LikesModal() {
               <div className="h-full grid auto-rows-min relative">
                 <div className="border-b border-gray-transparent text-center py-[9px]">
                   <span className="text-black-light font-medium text-base tracking-wide-[0.01rem]">
-                    Following
+                    Likes
                   </span>
                 </div>
                 <div className="absolute top-[43px] bottom-0 w-full pr-1.5">
