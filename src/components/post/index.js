@@ -32,6 +32,7 @@ export default function Post({ content, activeUserId }) {
         totalLikes={content.likes.length}
         handleFocus={handleFocus}
         activeUserId={activeUserId}
+        showLikesModal={true}
       />
       <Footer username={content.username} caption={content.caption} />
       <Comments

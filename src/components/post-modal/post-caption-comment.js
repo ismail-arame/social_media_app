@@ -463,6 +463,7 @@ export default function PostModalCaptionComment({
           posted={posted} //dateCreated
           handleFocus={handleFocus}
           activeUserId={activeUserId}
+          showLikesModal={false}
         />
         <div className="text-gray-light text-[10px] px-4 mt-2 mb-4 tracking-wide">
           {formatDistance(posted, new Date()).toUpperCase()} AGO

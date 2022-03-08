@@ -21,6 +21,7 @@ export default function Actions({
   userLikedPhoto,
   handleFocus,
   activeUserId,
+  showLikesModal,
 }) {
   const dispatch = useDispatch();
   const {
@@ -129,10 +130,13 @@ export default function Actions({
           <div
             className="text-sm font-semibold cursor-pointer"
             onClick={() => {
-              dispatch(setLikesModalOpen());
-              dispatch(
-                setPostLikesContent({ dateCreated, imageSrc, activeUserId })
-              );
+              //because we want to show it only when we are on the dashboard Route not the post modal Route
+              if (showLikesModal) {
+                dispatch(setLikesModalOpen());
+                dispatch(
+                  setPostLikesContent({ dateCreated, imageSrc, activeUserId })
+                );
+              }
             }}
           >
             {likes === 1 ? `${likes} like` : `${likes} likes`}
