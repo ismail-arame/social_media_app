@@ -46,11 +46,11 @@ export default function SignUp() {
           .firestore()
           .collection('users')
           .add({
-            profileImageSrc: '/images/avatars/default.jpg',
+            profileImageSrc: '/images/avatars/default.png',
             userId: createdUserResult.user.uid,
-            username: username.toLowerCase(),
+            username: username.toLowerCase().trim(),
             fullName,
-            emailAddress: emailAddress.toLowerCase(),
+            emailAddress: emailAddress.toLowerCase().trim(),
             following: [createdUserResult.user.uid],
             followers: [],
             dateCreated: new Date(),

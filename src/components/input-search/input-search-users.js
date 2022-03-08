@@ -1,3 +1,5 @@
+import { useRouteMatch } from 'react-router-dom';
+
 export default function InputSearchUsers({
   handleChange,
   searchedUserQuery,
@@ -5,8 +7,14 @@ export default function InputSearchUsers({
   setClickedOutsideCardlist,
   setFocusOnInput,
 }) {
+  const match = useRouteMatch();
+  console.log('match', match.path);
   return (
-    <div className="h-9 w-[268px] relative">
+    <div
+      className={`h-9 w-[268px] relative ${
+        match.path === '/p/:username' ? 'hidden' : ''
+      }`}
+    >
       <input
         aria-label="search for a user"
         type="search"

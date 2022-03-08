@@ -6,6 +6,7 @@ import { setPostModalOpen } from '../../redux/post-modal/post-modal.actions';
 import AddComment from '../post/add-comment';
 import Actions from '../post/actions';
 import FirebaseContext from '../../context/firebase';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function PostModalCaptionComment({
   photoDocId,
@@ -21,6 +22,7 @@ export default function PostModalCaptionComment({
   handleFocus,
   activeUserId,
 }) {
+  const [isLazyLoading, setLazyLoading] = useState(false);
   const dispatch = useDispatch();
 
   const { firebase } = useContext(FirebaseContext);
@@ -177,11 +179,23 @@ export default function PostModalCaptionComment({
             className="flex items-start mt-4"
             aria-label="caption section"
           >
-            <div className="w-11 w- h-11 rounded-full mr-4 ">
-              <img
+            <div
+              className={`w-11 w- h-11 rounded-full mr-4 transition-colors ${
+                isLazyLoading ? 'bg-gray-lazy2 animate-pulse-faster' : ''
+              }`}
+            >
+              <LazyLoadImage
+                width="100%"
+                height="100%"
+                effect="blur"
                 src={postUserProfileImageSrc}
                 alt={`${postUserUsername} img`}
-                className="rounded-full h-full w-full border border-gray-lightweight object-cover"
+                className="rounded-full w-full h-full border border-gray-lightweight object-cover"
+                beforeLoad={() => setLazyLoading(true)}
+                afterLoad={() => setLazyLoading(false)}
+                onError={e => {
+                  e.target.src = '/images/avatars/default.png';
+                }}
               />
             </div>
             <div className="flex flex-col">
@@ -209,11 +223,25 @@ export default function PostModalCaptionComment({
                 <div key={i} className="flex flex-col">
                   <div className="flex justify-between">
                     <div className="flex items-start mt-6">
-                      <div className="w-9 w- h-9 rounded-full mr-4 ">
-                        <img
+                      <div
+                        className={`w-9 w- h-9 rounded-full mr-4 transition-colors ${
+                          isLazyLoading
+                            ? 'bg-gray-lazy2 animate-pulse-faster'
+                            : ''
+                        }`}
+                      >
+                        <LazyLoadImage
+                          width="100%"
+                          height="100%"
+                          effect="blur"
                           src={comment.profileImageSrc}
                           alt={`${comment.displayName} img`}
-                          className="rounded-full h-full w-full border border-gray-lightweight object-cover"
+                          className="rounded-full w-full h-full border border-gray-lightweight object-cover"
+                          beforeLoad={() => setLazyLoading(true)}
+                          afterLoad={() => setLazyLoading(false)}
+                          onError={e => {
+                            e.target.src = '/images/avatars/default.png';
+                          }}
                         />
                       </div>
                       <div className="flex flex-col">
@@ -305,11 +333,26 @@ export default function PostModalCaptionComment({
                           <div key={i} className="flex flex-col ">
                             <div className="flex justify-between">
                               <div className="flex items-start mt-6">
-                                <div className="w-9 w- h-9 rounded-full mr-4 ">
-                                  <img
+                                <div
+                                  className={`w-9 w- h-9 rounded-full mr-4 transition-colors ${
+                                    isLazyLoading
+                                      ? 'bg-gray-lazy2 animate-pulse-faster'
+                                      : ''
+                                  }`}
+                                >
+                                  <LazyLoadImage
+                                    width="100%"
+                                    height="100%"
+                                    effect="blur"
                                     src={replyComment.profileImageSrc}
                                     alt={`${replyComment.displayName} img`}
-                                    className="rounded-full h-full w-full border border-gray-lightweight object-cover"
+                                    className="rounded-full w-full h-full border border-gray-lightweight object-cover"
+                                    beforeLoad={() => setLazyLoading(true)}
+                                    afterLoad={() => setLazyLoading(false)}
+                                    onError={e => {
+                                      e.target.src =
+                                        '/images/avatars/default.png';
+                                    }}
                                   />
                                 </div>
                                 <div className="flex flex-col">

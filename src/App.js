@@ -37,6 +37,7 @@ export default function App() {
   const dispatch = useDispatch();
   const match = useRouteMatch();
   const location = useLocation();
+  console.log('location', location);
   const background = location.state && location.state.background;
 
   useEffect(() => {

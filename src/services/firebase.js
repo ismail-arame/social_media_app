@@ -26,13 +26,19 @@ export async function getUserByUsername(username) {
   });
 }
 
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Profile Photos *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
 //Profile (getting photos of users we search for =>  www.instagram.com/p/username)
 export async function getUserPhotosByUserId(userId) {
   const result = await firebase
     .firestore()
     .collection('photos')
     .where('userId', '==', userId)
+    .orderBy('dateCreated', 'desc')
+    .limit(3)
     .get();
+
+  const lastDoc = result.docs[result.docs.length - 1]; //Infinite Scrolling
 
   //WARNING! : => when building pop up component remember to pass in username and profileImageSrc because you will need it (ismail from the past)
   if (!result.empty) {
@@ -40,6 +46,7 @@ export async function getUserPhotosByUserId(userId) {
       return {
         ...item.data(),
         docId: item.id,
+        lastDoc,
       };
     });
   } else {
@@ -110,6 +117,8 @@ export async function getSuggestedProfiles(userId, following) {
 //     );
 // }
 
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Following and Followers Functionality *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
 //update the LoggedIn User Following
 //go to the document Id of the Active User and updating the Following array of the active User with the Profile Suggested Id
 export async function updateLoggedInUserFollowing(
@@ -147,6 +156,8 @@ export async function updateFollowedUserFollowers(
     });
 }
 
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Toggle Follow *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
 //Profile Page Toggling Follow and Unfollow and make changes to Firestore Database
 export async function toggleFollow(
   loggedInUserDocId,
@@ -170,6 +181,9 @@ export async function toggleFollow(
 //Checking if the Current Logged In User is Following the User Profile searched (wwww.instagram.com/p/Profile)
 export async function isUserFollowingProfile() {}
 
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* TimeLine Photos *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+//INFINITE SCROLL
 //getting photos of the people the active user Followed
 export async function getPhotos(userId, following) {
   const result = await firebase
@@ -214,43 +228,9 @@ export async function getPhotos(userId, following) {
   }
 }
 
-//INFINITE SCROLL
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Post Modal Photo *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
 
-//getting photos of the people the active user Followed
-// export async function getPhotos(userId, following) {
-//   const result = await firebase
-//     .firestore()
-//     .collection('photos')
-//     .where('userId', 'in', following)
-//     .get();
-
-//   const userFollowedPhotos = result.docs.map(photo => {
-//     return {
-//       ...photo.data(),
-//       docId: photo.id,
-//     };
-//   });
-//   // console.log(userFollowedPhotos);
-
-//   //if you wanna await within a map use Promise.all
-//   const photosWithUserDetails = await Promise.all(
-//     userFollowedPhotos.map(async photo => {
-//       let userLikedPhoto = false;
-//       if (photo.likes.includes(userId)) userLikedPhoto = true;
-
-//       //in the header of the Post we wanna display the owner of the Post
-//       //in the firestore photos schema there is not the username of the Post owner
-//       //user = [{username: ..., fullName:...,  ...others}]
-//       const [user] = await getUserByUserId(photo.userId);
-//       const { username } = user;
-
-//       return { username, ...photo, userLikedPhoto };
-//     })
-//   );
-
-//   return photosWithUserDetails;
-// }
-
+//Data needed for a specific Post Modal based on dateCreated and imageSrc
 export async function getPhotoByDateCreatedAndImageSrc(
   dateCreated,
   imageSrc,
@@ -290,3 +270,78 @@ export async function getPhotoByDateCreatedAndImageSrc(
   console.log('photosWithUserDetails', photosWithUserDetails);
   return photosWithUserDetails;
 }
+
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Followers Modal Data *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+//getting all the users that follows the profile user (Profile Followers)
+export const getProfileFollowersUsers = async profileUserId => {
+  const result = await firebase
+    .firestore()
+    .collection('users')
+    .where('following', 'array-contains', profileUserId)
+    .where('userId', '!=', profileUserId)
+    .get();
+
+  if (!result.empty) {
+    return result.docs.map(user => {
+      return {
+        ...user.data(),
+        docId: user.id,
+      };
+    });
+  } else {
+    return [];
+  }
+};
+
+// const getData = async () => {
+//   const response = await getProfileFollowersUsers(user.userId);
+//   console.log('response followers', response);
+// };
+// getData();
+
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Followers Modal Data *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+//getting all the users that the profile User is Following (Profile Following)
+export const getProfileFollowingUsers = async profileUserId => {
+  console.log('userrr', profileUserId);
+  const result = await firebase
+    .firestore()
+    .collection('users')
+    .where('followers', 'array-contains', profileUserId)
+    .where('userId', '!=', profileUserId)
+    .get();
+
+  if (!result.empty) {
+    return result.docs.map(user => {
+      return {
+        ...user.data(),
+        docId: user.id,
+      };
+    });
+  } else {
+    return [];
+  }
+};
+
+// *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_* Likes Modal Data *_*_*_*_*_*_*_*_*_*_*_*_*_*_*_*
+
+//getting al the users that liked a Post
+export const getPostLikesUsers = async likesArray => {
+  const usersLikedPostData = await Promise.all(
+    likesArray.map(async likeUserId => {
+      const result = await firebase
+        .firestore()
+        .collection('users')
+        .where('userId', '==', likeUserId)
+        .get();
+
+      return {
+        ...result.docs[0].data(),
+        docId: result.docs[0].id,
+      };
+    })
+  );
+
+  return usersLikedPostData;
+};

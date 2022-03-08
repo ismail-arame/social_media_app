@@ -2,10 +2,10 @@ import Skeleton from 'react-loading-skeleton';
 import { SkeletonTheme } from 'react-loading-skeleton';
 import 'react-loading-skeleton/dist/skeleton.css';
 
-const TimelineSkeleton = () => {
+const TimelineSkeleton = ({ numberOfTimelineSkeleton }) => {
   return (
     <div>
-      {[...new Array(2)].map((_, index) => (
+      {[...new Array(numberOfTimelineSkeleton)].map((_, index) => (
         <SkeletonTheme key={index} baseColor="#ebe8e8" highlightColor="#FAFAFA">
           <div className="rounded  border bg-white border-gray-transparent border-b-white	 translate-y-[5px] rounded-br-none rounded-bl-none">
             <div className="flex h-4 p-4 py-8">

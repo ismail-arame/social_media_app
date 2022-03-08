@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { setPostModalOpen } from '../../redux/post-modal/post-modal.actions';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function PostModalHeader({
   postUserUsername,
@@ -11,14 +13,27 @@ export default function PostModalHeader({
   handleToggleFollow,
 }) {
   const dispatch = useDispatch();
+  const [isLazyLoading, setLazyLoading] = useState(false);
+
   return (
     <header className="flex items-center h-8 border-b border-gray-lightweight py-8 px-4">
-      <div className="w-11 h-11 rounded-full mr-4">
-        <img
+      <div
+        className={`w-11 h-11 rounded-full mr-4 transition-colors ${
+          isLazyLoading ? 'bg-gray-lazy2 animate-pulse-faster' : ''
+        }`}
+      >
+        <LazyLoadImage
+          width="100%"
+          height="100%"
+          effect="blur"
           src={postUserProfileImageSrc}
           alt={`${postUserUsername} img`}
-          className="rounded-full w-full h-full border border-gray-lightweight object-cover
-"
+          className="rounded-full w-full h-full border border-gray-lightweight object-cover"
+          beforeLoad={() => setLazyLoading(true)}
+          afterLoad={() => setLazyLoading(false)}
+          onError={e => {
+            e.target.src = '/images/avatars/default.png';
+          }}
         />
       </div>
       <div className="flex flex-col justify-center mr-5">

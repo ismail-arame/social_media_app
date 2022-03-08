@@ -8,10 +8,13 @@ import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { selectUploadProfileImageSrc } from '../../redux/upload-profile/upload-profile.selectors';
 // import { setOpenUploadProfileModal } from '../redux/upload-profile/upload-profile.actions.js';
 import { setOpenUploadProfileModal } from '../../redux/upload-profile/upload-profile.actions';
+import { setFollowingModalOpen } from '../../redux/following-modal/following-modal.actions';
+import { setFollowersModalOpen } from '../../redux/followers-modal/followers-modal.actions';
 // const dispatch = useDispatch();
 
 import { LazyLoadImage } from 'react-lazy-load-image-component';
 
+import { setFollowerCount } from '../../redux/profile-photos/profile-photos.actions';
 import {
   // isUserFollowingProfile,
   //https://fond-ecran-manga.fr/wp-content/uploads/2020/06/heroes-450x253.jpg
@@ -31,7 +34,7 @@ export default function Header({
     profileImageSrc,
   },
   followerCount,
-  setFollowerCount,
+  // setFollowerCount,
 }) {
   const [isFollowingProfile, setIsFollowingProfile] = useState(false);
 
@@ -58,10 +61,11 @@ export default function Header({
   const handleToggleFollow = async () => {
     setIsFollowingProfile(isFollowingProfile => !isFollowingProfile);
 
-    //setFollowerCount is the dispatch function that we passed as props from profile index to Header Component
-    setFollowerCount({
-      followerCount: isFollowingProfile ? followerCount - 1 : followerCount + 1,
-    });
+    if (isFollowingProfile) {
+      dispatch(setFollowerCount(followerCount - 1));
+    } else {
+      dispatch(setFollowerCount(followerCount + 1));
+    }
 
     await toggleFollow(
       userFirestore.docId,
@@ -123,11 +127,15 @@ export default function Header({
               </p>
               {activeBtnFollow ? (
                 <button
-                  className="font-semibold text-sm bg-blue-light rounded text-white w-24 h-8 tracking-wide"
+                  className={`font-semibold text-sm rounded tracking-wide w-24 h-8 ${
+                    isFollowingProfile
+                      ? 'bg-gray-background border border-gray-transparent text-black-light'
+                      : 'bg-blue-light text-white'
+                  }`}
                   type="button"
                   onClick={handleToggleFollow}
                 >
-                  {isFollowingProfile ? 'UnFollow' : 'Follow'}
+                  {isFollowingProfile ? 'Following' : 'Follow'}
                 </button>
               ) : (
                 <button
@@ -152,7 +160,10 @@ export default function Header({
                   </span>
                 </span>
               </p>
-              <p className="mr-10">
+              <p
+                className="mr-10 cursor-pointer"
+                onClick={() => dispatch(setFollowersModalOpen())}
+              >
                 <span className="font-semibold">
                   {followerCount}{' '}
                   <span className="text-black-light font-normal">
@@ -161,7 +172,10 @@ export default function Header({
                   </span>
                 </span>
               </p>
-              <p className="mr-10">
+              <p
+                className="mr-10 cursor-pointer"
+                onClick={() => dispatch(setFollowingModalOpen())}
+              >
                 <span className="font-semibold">
                   {profileFollowing.length - 1}
                   <span className="text-black-light font-normal">
@@ -182,9 +196,8 @@ export default function Header({
 }
 
 Header.propTypes = {
-  photosCount: propTypes.number.isRequired,
+  photosCount: propTypes.number,
   followerCount: propTypes.number.isRequired,
-  setFollowerCount: propTypes.func.isRequired,
   profile: propTypes.shape({
     docId: propTypes.string,
     userId: propTypes.string,

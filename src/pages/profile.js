@@ -19,6 +19,8 @@ import UploadProfileModal from '../components/upload-profile-modal';
 import { useDispatch } from 'react-redux';
 
 import { setUploadProfileImageSrc } from '../redux/upload-profile/upload-profile.actions';
+import FollowingModal from '../components/following-modal/following-modal';
+import FollowersModal from '../components/followers-modal/followers-modal';
 
 export default function Profile() {
   const { user: userFirestore } = useUser();
@@ -56,6 +58,8 @@ export default function Profile() {
       <div className=" bg-gray-background">
         <Header />
         <UploadModal />
+        <FollowingModal user={user} />
+        <FollowersModal user={user} />
         <UploadProfileModal />
         <div className="max-w-screen-lg px-10 mx-auto mt-24">
           <UserProfile user={user} />

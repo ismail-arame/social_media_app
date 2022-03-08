@@ -3,7 +3,14 @@ import propTypes from 'prop-types';
 import FirebaseContext from '../../context/firebase';
 import UserContext from '../../context/user';
 
+import {
+  getPostLikesUsers,
+  getPhotoByDateCreatedAndImageSrc,
+} from '../../services/firebase';
+
 export default function Actions({
+  imageSrc,
+  dateCreated,
   photoDocId,
   totalLikes,
   userLikedPhoto,
@@ -113,7 +120,19 @@ export default function Actions({
       </div>
       {likes !== 0 ? (
         <div className="p-4 py-0">
-          <div className="text-sm font-semibold">
+          <div
+            className="text-sm font-semibold cursor-pointer"
+            onClick={async () => {
+              const [photo] = await getPhotoByDateCreatedAndImageSrc(
+                dateCreated,
+                imageSrc,
+                activeUserId
+              );
+              // console.log('photo', photo);
+              const usersLikedPostData = await getPostLikesUsers(photo.likes);
+              // console.log('usersLikedPostData', usersLikedPostData);
+            }}
+          >
             {likes === 1 ? `${likes} like` : `${likes} likes`}
           </div>
         </div>

@@ -21,7 +21,7 @@ export default function AddComment({
     userFirestore: { username, profileImageSrc },
   } = useContext(UserFirestoreContext);
 
-  console.log('userFirestore', username);
+  console.log('userFirestore', username, profileImageSrc);
 
   const handleSubmitComment = async event => {
     event.preventDefault();

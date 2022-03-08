@@ -7,7 +7,7 @@ import Footer from './footer';
 import Comments from './comments';
 
 export default function Post({ content, activeUserId }) {
-  console.log(content);
+  console.log('content', content);
   const commentInput = useRef(null);
 
   const handleFocus = () => {
@@ -24,6 +24,8 @@ export default function Post({ content, activeUserId }) {
       />
       <Image content={content} />
       <Actions
+        imageSrc={content.imageSrc}
+        dateCreated={content.dateCreated}
         photoDocId={content.docId}
         userLikedPhoto={content.userLikedPhoto}
         totalLikes={content.likes.length}

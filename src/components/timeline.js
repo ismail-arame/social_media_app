@@ -149,7 +149,7 @@ export default function Timeline() {
       .where('userId', 'in', following)
       .orderBy('dateCreated', 'desc')
       .startAfter(lastDocument.current)
-      .limit(3)
+      .limit(6)
       .get();
 
     //unAttach event Listeners when there is no more documents in the Firestore
@@ -197,7 +197,7 @@ export default function Timeline() {
   return (
     <div className="container col-span-2">
       {!listOfPhotos ? (
-        <TimelineSkeleton />
+        <TimelineSkeleton numberOfTimelineSkeleton={2} />
       ) : listOfPhotos.length > 0 ? (
         <div>
           {listOfPhotos.map((content, index) => {
@@ -219,7 +219,7 @@ export default function Timeline() {
           })}
           {nextPosts_loading ? (
             // <p className=" text-xl text-center w-full font-bold">Loading...</p>
-            <TimelineSkeleton />
+            <TimelineSkeleton numberOfTimelineSkeleton={1} />
           ) : isEmpty ? (
             <p className="w-full text-lg font-bold text-center mb-16 mt-8">
               You Saw All Followed Users Photos

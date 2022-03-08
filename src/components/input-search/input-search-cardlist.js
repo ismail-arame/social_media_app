@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { LazyLoadImage } from 'react-lazy-load-image-component';
+
+import { selectListOfProfilePhotos } from '../../redux/profile-photos/profile-photos.selectors';
+import { setListOfProfilePhotos } from '../../redux/profile-photos/profile-photos.actions';
+import { getUserPhotosByUserId } from '../../services/firebase';
 
 export default function InputSearchCardlist({
   users, //filterd users
@@ -8,6 +13,12 @@ export default function InputSearchCardlist({
   loading,
   setClickedOutsideCardlist,
 }) {
+  const dispatch = useDispatch();
+  const listOfProfilePhotos = useSelector(
+    selectListOfProfilePhotos,
+    shallowEqual
+  );
+
   const [isLazyLoading, setLazyLoading] = useState(false);
   const wrapperRef = useRef(null); //Cardlist Ref
 
@@ -63,7 +74,11 @@ export default function InputSearchCardlist({
               <div key={i}>
                 <Link
                   to={`/p/${user.username}`}
-                  onClick={() => setClickedOutsideCardlist(true)}
+                  onClick={async () => {
+                    setClickedOutsideCardlist(true);
+                    const photos = await getUserPhotosByUserId(user.userId);
+                    dispatch(setListOfProfilePhotos(photos));
+                  }}
                 >
                   <div className="flex items-center hover:bg-gray-searchHover transition-colors p-[6.5px] px-3">
                     <div
