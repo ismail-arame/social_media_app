@@ -5,6 +5,7 @@ import Image from './image';
 import Actions from './actions';
 import Footer from './footer';
 import Comments from './comments';
+import LikesModal from '../likes-modal/likes-modal';
 
 export default function Post({ content, activeUserId }) {
   console.log('content', content);
@@ -57,3 +58,11 @@ Post.prototype = {
     likes: propTypes.array.isRequired,
   }),
 };
+
+//i have to set the state of opening the likes modal to each post
+
+// <LikesModal
+//         dateCreated={content.dateCreated}
+//         imageSrc={content.imageSrc}
+//         activeUserId={activeUserId}
+// />

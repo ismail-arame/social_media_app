@@ -1,7 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
+import { useDispatch } from 'react-redux';
 import propTypes from 'prop-types';
 import FirebaseContext from '../../context/firebase';
 import UserContext from '../../context/user';
+import {
+  setLikesModalOpen,
+  setPostLikesContent,
+} from '../../redux/likes-modal/likes-modal.actions';
 
 import {
   getPostLikesUsers,
@@ -17,6 +22,7 @@ export default function Actions({
   handleFocus,
   activeUserId,
 }) {
+  const dispatch = useDispatch();
   const {
     user: { uid: userId = '' },
   } = useContext(UserContext);
@@ -122,15 +128,11 @@ export default function Actions({
         <div className="p-4 py-0">
           <div
             className="text-sm font-semibold cursor-pointer"
-            onClick={async () => {
-              const [photo] = await getPhotoByDateCreatedAndImageSrc(
-                dateCreated,
-                imageSrc,
-                activeUserId
+            onClick={() => {
+              dispatch(setLikesModalOpen());
+              dispatch(
+                setPostLikesContent({ dateCreated, imageSrc, activeUserId })
               );
-              // console.log('photo', photo);
-              const usersLikedPostData = await getPostLikesUsers(photo.likes);
-              // console.log('usersLikedPostData', usersLikedPostData);
             }}
           >
             {likes === 1 ? `${likes} like` : `${likes} likes`}

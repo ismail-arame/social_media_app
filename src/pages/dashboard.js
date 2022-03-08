@@ -8,6 +8,7 @@ import UploadModal from '../components/upload-modal';
 import Sidebar from '../components/sidebar';
 import useUser from '../hooks/use-user';
 import UserFirestoreContext from '../context/user-firestore';
+import LikesModal from '../components/likes-modal/likes-modal';
 // import PostModal from '../components/post-modal';
 
 export default function Dashboard() {
@@ -21,6 +22,7 @@ export default function Dashboard() {
       <div className="bg-gray-background " id="container">
         <Header />
         <UploadModal />
+        <LikesModal />
         <div className="grid grid-cols-3 gap-6 mx-auto max-w-screen-lg justify-between px-10 mt-24">
           <Timeline />
           <Sidebar />
