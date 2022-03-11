@@ -26,6 +26,8 @@ export default function Timeline() {
   //not working as intended better useRef() to keep value between re renders
   // const [lastDocument, setLastDocument] = useState(null);
   let lastDocument = useRef(null);
+  let isFetchMoreDataEmpty = useRef(false);
+  let leaveWhileLoop = useRef(false);
 
   //using this Ref t check if a photo uploaded is the same when i change the likes or comments on it (without it thae image uploaded creates another copy of itself (and the reason is setListOfPhotos dosn't set the state unless react re renders))
   let photoUploaded = useRef(null);
@@ -38,6 +40,7 @@ export default function Timeline() {
     console.log('useEffect', following);
     console.log('useEffect photos', photos);
     if (photos && photos.length > 0) {
+      let numOfDocs = 0;
       const { lastDoc } = photos[0];
       //storing last Document
       lastDocument.current = lastDoc;
@@ -46,10 +49,15 @@ export default function Timeline() {
       //if it exists already do nothing else add it to the TimeLine Component
       // unSubscribeFromSnapshot = null;
 
+      // while (following.length || numOfDocs === 0){
+
+      // }
+      //because firebase cannot query an array that has more then 10 elements
+      const followingArr = following.slice(0, 9);
       const unSubscribeFromSnapshot = firebase
         .firestore()
         .collection('photos')
-        .where('userId', 'in', following)
+        .where('userId', 'in', followingArr)
         .orderBy('dateCreated', 'desc')
         .limit(1)
         .onSnapshot(async snapshot => {
@@ -139,21 +147,33 @@ export default function Timeline() {
 
   //Fetching More (INFINTE SCROLL)
   const fetchMore = async userId => {
+    let numOfDocs = 0;
+    let result;
+    leaveWhileLoop.current = false;
     const [{ following }] = await getUserByUserId(userId);
     console.log('following  FETCH MORE ********', following);
 
-    setNextPostsLoading(true); //loading State
-    const result = await firebase
-      .firestore()
-      .collection('photos')
-      .where('userId', 'in', following)
-      .orderBy('dateCreated', 'desc')
-      .startAfter(lastDocument.current)
-      .limit(6)
-      .get();
+    //because 'in' inside where doesn't take more than 10 elements in an array
+    while (following.length > 0 && numOfDocs === 0) {
+      setNextPostsLoading(true); //loading State
+      const followingArr = following.splice(0, 9);
+
+      result = await firebase
+        .firestore()
+        .collection('photos')
+        .where('userId', 'in', followingArr)
+        .orderBy('dateCreated', 'desc')
+        .startAfter(lastDocument.current)
+        .limit(6)
+        .get();
+
+      isFetchMoreDataEmpty.current = result.empty;
+
+      numOfDocs = result.docs.length;
+    }
 
     //unAttach event Listeners when there is no more documents in the Firestore
-    const isCollectionEmpty = result.size === 0;
+    const isCollectionEmpty = isFetchMoreDataEmpty.current;
 
     if (!isCollectionEmpty) {
       const userFollowedPhotos = result.docs.map(photo => {
@@ -222,7 +242,7 @@ export default function Timeline() {
             <TimelineSkeleton numberOfTimelineSkeleton={1} />
           ) : isEmpty ? (
             <p className="w-full text-lg font-bold text-center mb-16 mt-8">
-              You Saw All Followed Users Photos
+              Follow More People For More Posts
             </p>
           ) : null}
         </div>

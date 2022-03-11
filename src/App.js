@@ -44,9 +44,10 @@ export default function App() {
     const getUserData = async () => {
       const [userFirestoreData] = await getUserByUserId(user?.uid);
       //updating user Profile Image on initial render of profile page
+
       dispatch(setUploadProfileImageSrc(userFirestoreData.profileImageSrc));
     };
-    getUserData();
+    if (user) getUserData();
   }, [user, dispatch]);
 
   // location={postModalOpen ? background : location} => not good it will re render the Dshboard ROUTE once we remove the modal

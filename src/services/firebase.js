@@ -77,23 +77,31 @@ export async function getUserByUserId(userId) {
 
 //we don't wanna suggest to the user the profiles that he already following
 export async function getSuggestedProfiles(userId, following) {
-  let query = firebase.firestore().collection('users');
+  const result = await firebase
+    .firestore()
+    .collection('users')
+    .where('userId', '!=', userId)
+    .get();
 
-  //we wanna query only for the documents which thier userId doesn't exist in the array of the active user followings and the activeUserId [...following, userId]
-  if (following.length > 0)
-    query = query.where('userId', 'not-in', [...following, userId]);
-  else {
-    query = query.where('userId', '!=', userId);
-  }
-
-  const result = await query.limit(10).get();
-
-  const suggestedProfiles = result.docs.map(profile => {
-    return {
-      ...profile.data(),
-      docId: profile.id,
-    };
-  });
+  const suggestedProfiles = result.docs
+    .map(profile => {
+      return {
+        ...profile.data(),
+        docId: profile.id,
+      };
+    })
+    .filter(profile => {
+      console.log('followingArr', profile);
+      console.log(
+        'followingArr condition',
+        ![...following, userId].includes(profile.userId)
+      );
+      if (following.length > 0) {
+        return ![...following, userId].includes(profile.userId);
+      } else {
+        return profile.userId !== userId;
+      }
+    });
 
   return suggestedProfiles;
 }
@@ -186,13 +194,20 @@ export async function isUserFollowingProfile() {}
 //INFINITE SCROLL
 //getting photos of the people the active user Followed
 export async function getPhotos(userId, following) {
-  const result = await firebase
-    .firestore()
-    .collection('photos')
-    .where('userId', 'in', following)
-    .orderBy('dateCreated', 'desc')
-    .limit(1)
-    .get();
+  let numOfDocs = 0;
+  let result;
+  while (following.length && numOfDocs === 0) {
+    const followingArr = following.splice(0, 9);
+    result = await firebase
+      .firestore()
+      .collection('photos')
+      .where('userId', 'in', followingArr)
+      .orderBy('dateCreated', 'desc')
+      .limit(1)
+      .get();
+
+    numOfDocs = result.docs.length;
+  }
 
   const userFollowedPhotos = result.docs.map(photo => {
     return {
